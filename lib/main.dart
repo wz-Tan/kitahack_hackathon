@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'test.dart' as test;
 void main() {
   runApp(const MainApp());
 }
@@ -14,8 +14,15 @@ class LessonData{
 
 //Global App State
 class MainAppState extends ChangeNotifier{
-  //List of Classes
+  //List of Lessons
   List<LessonData> lessons=[LessonData("Chapter 1"),LessonData("Chapter 2"),LessonData("Chapter 3"),LessonData("Chapter 4")];
+  int selectedPage=0;
+
+  void changePage(int page){
+    selectedPage=page;
+    print("PAGE IS CHANGEDDD $selectedPage");
+    notifyListeners();
+  }
 }
 
 //Main App, Prepares State and Prompts Main Layout
@@ -43,10 +50,18 @@ class MainLayout extends StatefulWidget{
 }
 
 class _MainLayoutState extends State<MainLayout>{
-  //Variables Here
 
   @override
   Widget build(BuildContext context) {
+    var selectedPage=context.watch<MainAppState>().selectedPage;
+    Widget displayedPage;
+
+    if (selectedPage==-1){
+      displayedPage=ChaptersPage();
+    }
+    else{
+      displayedPage=test.TestPage();
+    }
     return Scaffold(
       //Top App Bar, Set Size then the Child (Set to Black Color For Easy Visualisation)
       appBar: PreferredSize(
@@ -67,7 +82,7 @@ class _MainLayoutState extends State<MainLayout>{
           )),
 
       body:Expanded(
-        child: ChaptersPage()
+        child: displayedPage
       )
     );
   }
@@ -82,6 +97,7 @@ class ChaptersPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     var lessons=context.watch<MainAppState>().lessons;
+    var page=context.watch<MainAppState>().selectedPage;
 
     //Padding, Sized Box then Column
     return Padding(
@@ -91,6 +107,7 @@ class ChaptersPage extends StatelessWidget{
         height: double.infinity,
         child: Column(
           children: [
+            Text("$page"),
             for (var lesson in lessons.indexed)
               ChapterSelectionBox(chapterName: lesson.$2.chapterName, index: lesson.$1)
           ],
@@ -108,6 +125,7 @@ class ChapterSelectionBox extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
+    var appState=context.watch<MainAppState>();
     return Padding(
       padding: EdgeInsets.all(10),
 
@@ -119,6 +137,7 @@ class ChapterSelectionBox extends StatelessWidget{
         child:InkWell(
           onTap: (){
             print("I am tapped! $index");
+            appState.changePage(index);
           },
 
         child: Card(
