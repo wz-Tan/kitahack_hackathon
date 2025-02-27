@@ -1,28 +1,40 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'test.dart' as test;
 import 'chapters_page.dart' as chapters_page;
+import 'question_page.dart' as question_page;
 
 void main() {
   runApp(const MainApp());
 }
 
 //Data Class
-class LessonData{
-  LessonData(this.chapterName);
-  String chapterName;
+
+class Question{
+  Question({required this.difficulty,required this.description,required this.answer,required this.hint});
+  String difficulty;
+  String description;
+  String answer;
+  String hint;
 }
+
+class Chapter{
+  Chapter({required this.chapterName, required this.questionList});
+  String chapterName;
+  List<Question> questionList;
+}
+
 
 //Global App State
 class MainAppState extends ChangeNotifier{
   //List of Lessons
-  List<LessonData> lessons=[LessonData("Chapter 1"),LessonData("Chapter 2"),LessonData("Chapter 3"),LessonData("Chapter 4")];
-  int selectedPage=0;
+  List<Chapter> lessons=[
+    Chapter(chapterName: "Chapter 1", 
+    questionList: [Question(difficulty: "Hard", description: "5+5=?", answer: "10", hint: "Use PEMDAS")])];
+  int selectedPage=-1;
 
   void changePage(int page){
     selectedPage=page;
-    print("PAGE IS CHANGEDDD $selectedPage");
     notifyListeners();
   }
 }
@@ -62,7 +74,7 @@ class _MainLayoutState extends State<MainLayout>{
       displayedPage=chapters_page.ChaptersPage();
     }
     else{
-      displayedPage=test.TestPage();
+      displayedPage=question_page.QuestionPage(chapterIndex: selectedPage);
     }
     return Scaffold(
       //Top App Bar, Set Size then the Child (Set to Black Color For Easy Visualisation)
