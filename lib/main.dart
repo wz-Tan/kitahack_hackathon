@@ -1,20 +1,94 @@
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'test.dart' as test;
+import 'chapters_page.dart' as chapters_page;
 
 void main() {
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
+//Data Class
+class LessonData{
+  LessonData(this.chapterName);
+  String chapterName;
+}
+
+//Global App State
+class MainAppState extends ChangeNotifier{
+  //List of Lessons
+  List<LessonData> lessons=[LessonData("Chapter 1"),LessonData("Chapter 2"),LessonData("Chapter 3"),LessonData("Chapter 4")];
+  int selectedPage=0;
+
+  void changePage(int page){
+    selectedPage=page;
+    print("PAGE IS CHANGEDDD $selectedPage");
+    notifyListeners();
+  }
+}
+
+//Main App, Prepares State and Prompts Main Layout
+class MainApp extends StatelessWidget{
   const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
+    return ChangeNotifierProvider(
+      create: (context)=>MainAppState(),
+      child: MaterialApp(
+        theme: Theme.of(context),
+        home: MainLayout(),
+      )
+      );
   }
 }
+
+//Create App State and App, Then Set the Child as the layout, then set child of layout as page
+//Main Layout, Requires State to Navigate
+class MainLayout extends StatefulWidget{
+  const MainLayout({super.key});
+  @override
+  State<MainLayout> createState()=>_MainLayoutState();
+}
+
+class _MainLayoutState extends State<MainLayout>{
+
+  @override
+  Widget build(BuildContext context) {
+    var selectedPage=context.watch<MainAppState>().selectedPage;
+    Widget displayedPage;
+
+    if (selectedPage==-1){
+      displayedPage=chapters_page.ChaptersPage();
+    }
+    else{
+      displayedPage=test.TestPage();
+    }
+    return Scaffold(
+      //Top App Bar, Set Size then the Child (Set to Black Color For Easy Visualisation)
+      appBar: PreferredSize(
+        preferredSize: Size(double.infinity, 30), 
+
+          //Fill Max parent Size, cannot use expanded since preferred size is not a column row or container
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            alignment: Alignment.bottomCenter,
+            padding: EdgeInsets.all(10),
+            color: Color(0xFF000000),
+
+            //Text At Low Center
+            child: Text("Top App Bar",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white,fontSize: 20),),
+          )),
+
+      body:Expanded(
+        child: displayedPage
+      )
+    );
+  }
+
+}
+
+

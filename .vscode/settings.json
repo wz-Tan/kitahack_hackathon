@@ -1,3 +1,6 @@
 {
-    "editor.fontSize": 13
+    "editor.fontSize": 13,
+    "cmake.ignoreCMakeListsMissing": true,
+    "editor.inlayHints.enabled": "off",
+    "dart.closingLabels": false
 }
