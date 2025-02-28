@@ -47,7 +47,6 @@ class ChapterSelectionBox extends StatelessWidget{
         //Inkwell is an On Click Listener
         child:InkWell(
           onTap: (){
-            print("I am tapped! $index");
             appState.changePage(index);
           },
 

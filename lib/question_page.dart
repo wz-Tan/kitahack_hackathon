@@ -11,7 +11,8 @@ class QuestionPage extends StatelessWidget{
     //Take In Question List From Main
     var questionList=context.watch<main.MainAppState>().lessons[chapterIndex].questionList;
 
-    return SizedBox(
+    return Container(
+      color: main.lightBlue,
       width: double.infinity,
       height: double.infinity,
       child: Contents(questionList: questionList)
@@ -47,13 +48,51 @@ class _ContentsState extends State<Contents> {
     return SizedBox(
       width: double.infinity,
       height: double.infinity,
-      child: Column(
-      children: [
-        Text(description),
-        Text(hint),
-        Text(answer),
-        Text("Difficulty is: $difficulty"),
+
+      child:
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            //Top Bar
+            Container(
+              color: main.darkBlue,
+              width: double.infinity,
+              height: 50,
+
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+
+                  children: [
+                    if(questionIndex!=0)
+                    Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      ),
+
+                    //Expanded to Use Align Width
+                    Text("${questionIndex+1}/${questionList.length}",style: main.defaultText,textAlign: TextAlign.center,),
+                     Icon(
+                      Icons.arrow_forward,
+                      color: Colors.white,
+                      ),
+                  ],
+                ),
+                )
+            ),
+
+            //Contents
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: Text(description,style: main.questionText)
+              )
+            
       ],
+      
     ),
     );
     

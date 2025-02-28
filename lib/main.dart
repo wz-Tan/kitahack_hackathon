@@ -8,6 +8,15 @@ void main() {
   runApp(const MainApp());
 }
 
+//Texts 
+const defaultText=TextStyle(color: Colors.white, fontSize: 20, fontFamily: "Consolas");
+const questionText=TextStyle(color: Colors.black, fontSize: 25, fontFamily: "Consolas");
+//Colours
+const whiteBlue=Color(0xFFcaf0f8);
+const darkBlue=Color(0xFF03045e);
+const midBlue=Color(0xFF00b4d8);
+const lightBlue=Color(0xFF90e0ef);
+
 //Data Class
 
 class Question{
@@ -79,18 +88,16 @@ class _MainLayoutState extends State<MainLayout>{
     return Scaffold(
       //Top App Bar, Set Size then the Child (Set to Black Color For Easy Visualisation)
       appBar: PreferredSize(
-        preferredSize: Size(double.infinity, 30), 
+        preferredSize: Size(double.infinity, 0), 
 
           //Fill Max parent Size, cannot use expanded since preferred size is not a column row or container
           child: Container(
             width: double.infinity,
             height: double.infinity,
             alignment: Alignment.bottomCenter,
-            padding: EdgeInsets.all(10),
-            color: Color(0xFF000000),
-
+            
             //Text At Low Center
-            child: Text("Top App Bar",
+            child: Text("",
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white,fontSize: 20),),
           )),
