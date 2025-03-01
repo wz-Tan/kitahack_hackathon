@@ -8,14 +8,8 @@ void main() {
   runApp(const MainApp());
 }
 
-//Texts 
-const defaultText=TextStyle(color: Colors.white, fontSize: 20, fontFamily: "Consolas");
-const questionText=TextStyle(color: Colors.black, fontSize: 25, fontFamily: "Consolas");
-//Colours
-const whiteBlue=Color(0xFFcaf0f8);
-const darkBlue=Color(0xFF03045e);
-const midBlue=Color(0xFF00b4d8);
-const lightBlue=Color(0xFF90e0ef);
+
+
 
 //Data Class
 
@@ -39,7 +33,9 @@ class MainAppState extends ChangeNotifier{
   //List of Lessons
   List<Chapter> lessons=[
     Chapter(chapterName: "Chapter 1", 
-    questionList: [Question(difficulty: "Hard", description: "5+5=?", answer: "10", hint: "Use PEMDAS")])];
+    questionList: [
+      Question(difficulty: "Hard", description: "5+5=?", answer: "10", hint: "Use PEMDAS"),
+      Question(difficulty: "Hard", description: "1000*20343204302302=?", answer: "10", hint: "Use PEMDAS")])];
   int selectedPage=-1;
 
   void changePage(int page){
@@ -102,7 +98,9 @@ class _MainLayoutState extends State<MainLayout>{
             style: TextStyle(color: Colors.white,fontSize: 20),),
           )),
 
-      body:Expanded(
+      body:SizedBox(
+        width: double.infinity,
+        height: double.infinity,
         child: displayedPage
       )
     );
