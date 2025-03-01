@@ -8,6 +8,9 @@ void main() {
   runApp(const MainApp());
 }
 
+
+
+
 //Data Class
 
 class Question{
@@ -30,7 +33,9 @@ class MainAppState extends ChangeNotifier{
   //List of Lessons
   List<Chapter> lessons=[
     Chapter(chapterName: "Chapter 1", 
-    questionList: [Question(difficulty: "Hard", description: "5+5=?", answer: "10", hint: "Use PEMDAS")])];
+    questionList: [
+      Question(difficulty: "Hard", description: "5+5=?", answer: "10", hint: "Use PEMDAS"),
+      Question(difficulty: "Hard", description: "1000*20343204302302=?", answer: "10", hint: "Use PEMDAS")])];
   int selectedPage=-1;
 
   void changePage(int page){
@@ -79,23 +84,23 @@ class _MainLayoutState extends State<MainLayout>{
     return Scaffold(
       //Top App Bar, Set Size then the Child (Set to Black Color For Easy Visualisation)
       appBar: PreferredSize(
-        preferredSize: Size(double.infinity, 30), 
+        preferredSize: Size(double.infinity, 0), 
 
           //Fill Max parent Size, cannot use expanded since preferred size is not a column row or container
           child: Container(
             width: double.infinity,
             height: double.infinity,
             alignment: Alignment.bottomCenter,
-            padding: EdgeInsets.all(10),
-            color: Color(0xFF000000),
-
+            
             //Text At Low Center
-            child: Text("Top App Bar",
+            child: Text("",
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white,fontSize: 20),),
           )),
 
-      body:Expanded(
+      body:SizedBox(
+        width: double.infinity,
+        height: double.infinity,
         child: displayedPage
       )
     );
