@@ -1,29 +1,48 @@
 import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import credentials
+import json
 import dotenv
 import os
+import gemini 
 
 dotenv.load_dotenv()
 credentialPath=os.getenv("firebase_credential_path")
+
 #Initialise Firebase (API Key, Firebase, Client)
 cred = credentials.Certificate(credentialPath)
 firebase_admin.initialize_app(cred)
 client=firestore.client()
 
-#Sample JSON File
-sample_data={
-    "task":"clean dishes",
-    "status":"done"
-}
+sample_data=[
+    {
+    "name":"John",
+    "hobby":"none"
+    },
+    {
+    "name":"John",
+    "hobby":"none"
+    }
+]
 
-#Get/Create Reference to Collection/Folder, Create Document, Add Data
-folder=client.collection("SampleFolder")
-document=folder.document("V03ozbJ1tEn5N1cvVyOe")
-document.set(sample_data)
+def retrieveQuestions(age,location):
+    #Receive List Of Dictionaries Here
+    questionList=gemini.generateTestQuestion(age=age,country=location)
+    return questionList
+    
 
-#Retrieve Data/Instance From the Document
-print(document.get())
-info=document.get().to_dict()
-print(info)
+def uploadQuestions(username,age,location):
+    questionList=retrieveQuestions(age,location)
+    questionNum=0
+    client.collection(username).document("Questions").collection("TestQuestions").document(f"Question {questionNum}").set(sample_data)
+    return
+    for question in questionList:
+        client.collection(username).document("Questions").collection("TestQuestions").document(f"Question {questionNum}").set(question)
+        questionNum+=1
+    
+        
+    
+
+uploadQuestions("John",10,"China")
+    
 

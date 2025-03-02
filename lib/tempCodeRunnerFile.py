@@ -1,1 +1,1 @@
-document.set(sample_data)
+"Generate me a json file with the following format: [ Chapter 1 { title: Happiness } , Chapter 2 {title: Sadness}]. Send me the json file only/ "
