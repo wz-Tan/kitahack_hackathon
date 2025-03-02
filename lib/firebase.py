@@ -14,34 +14,42 @@ cred = credentials.Certificate(credentialPath)
 firebase_admin.initialize_app(cred)
 client=firestore.client()
 
-sample_data=[
-    {
-    "name":"John",
-    "hobby":"none"
-    },
-    {
-    "name":"John",
-    "hobby":"none"
-    }
-]
+sample_data={
+             "information":{
+                 "name":"JSDHSHDSJH",
+                 "age":"15"
+             },
+             "data":{
+                 "apple":"sasa",
+                 "nigdsdasdsa":"sahdashdhsa"
+             }
+             
+             }
 
 def retrieveQuestions(age,location):
     #Receive List Of Dictionaries Here
-    questionList=gemini.generateTestQuestion(age=age,country=location)
-    return questionList
+    questionDictList=gemini.generateTestQuestion(age=age,country=location)
     
+    #Assign A Key for Each of Them, then Dump Them Into A Dict
+    modifiedQuestionDictList=[]
+    questionIndex=1
+    for question in questionDictList:
+        modifiedQuestionDictList.append(
+            {f"Question {questionIndex}" : question}
+            )
+        questionIndex+=1
+    
+    return modifiedQuestionDictList
+
 
 def uploadQuestions(username,age,location):
     questionList=retrieveQuestions(age,location)
-    questionNum=0
-    client.collection(username).document("Questions").collection("TestQuestions").document(f"Question {questionNum}").set(sample_data)
-    return
+    questionIndex=1
     for question in questionList:
-        client.collection(username).document("Questions").collection("TestQuestions").document(f"Question {questionNum}").set(question)
-        questionNum+=1
-    
-        
-    
+        client.collection(username).document("Questions").collection("Test Questions").document(f"Question_{questionIndex}").set(question)
+        questionIndex+=1
+    return
+       
 
 uploadQuestions("John",10,"China")
     

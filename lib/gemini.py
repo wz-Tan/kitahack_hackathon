@@ -17,10 +17,12 @@ class question(BaseModel):
     topic : str
     description :str 
     answer: str
+    difficulty: str
+    hint: str
     
 
 def generateTestQuestion(age,country):
-    prompt_testQuestion=f"I am a {age} year old living in {country}. Strictly based on local goovernment education standards retrieved from referenced local exam papers and local newest textbooks, ask me a few questions to determine my math level for my age. Then, categorise my math level based on my responses into 3 levels: Beginner, Intermediate and Advanced. "
+    prompt_testQuestion=f"I am a {age} year old living in {country}. Strictly based on local goovernment education standards retrieved from referenced local exam papers and local newest textbooks, ask me a few questions to determine my math level for my age. "
     response = gemini_client.models.generate_content(
         model="gemini-2.0-flash", 
         contents=prompt_testQuestion,
@@ -31,7 +33,9 @@ def generateTestQuestion(age,country):
     )
     
     
-    json_string=response.text    
+    json_string=response.text  
+
     #Convert JSON String to a List of Dictionaries 
     return (json.loads(json_string))
 
+generateTestQuestion(20,"Malaysia")
