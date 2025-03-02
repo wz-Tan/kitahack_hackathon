@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'colours.dart' as colours;
 import 'main.dart' as main;
 
 //Chapters Page
@@ -12,9 +13,7 @@ class ChaptersPage extends StatelessWidget{
     var lessons=context.watch<main.MainAppState>().lessons;
 
     //Padding, Sized Box then Column
-    return Padding(
-      padding: EdgeInsets.all(20),
-      child: SizedBox(
+    return SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: Column(
@@ -23,7 +22,6 @@ class ChaptersPage extends StatelessWidget{
               ChapterSelectionBox(chapterName: lesson.$2.chapterName, index: lesson.$1)
           ],
         ),
-      )
     );
   }
 }
@@ -37,12 +35,15 @@ class ChapterSelectionBox extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     var appState=context.watch<main.MainAppState>();
-    return Padding(
-      padding: EdgeInsets.all(10),
-
-      child: SizedBox(
+    return Container(
         width: double.infinity,
         height: 60,
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(width: 1),
+            bottom: BorderSide(width: 1)
+          )
+        ),
 
         //Inkwell is an On Click Listener
         child:GestureDetector(
@@ -50,17 +51,18 @@ class ChapterSelectionBox extends StatelessWidget{
             appState.changePage(index);
           },
 
-        child: Card(
-        color: Colors.blue,
-        
-        child: Center(
-          child:Text(chapterName,
-          style: TextStyle(color: Colors.white,
-          fontSize: 30))
+        child: Stack(
+          alignment: AlignmentDirectional.centerStart,
+          children: [
+            Positioned(
+              left: 15,
+              child: 
+              Text(chapterName,
+                  style: TextStyle(color: colours.black,
+                  fontSize: 20)))
+          ],
         )
-        ),
       ),
-      )
     );
   }
 }

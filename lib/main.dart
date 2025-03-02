@@ -14,7 +14,8 @@ void main() {
 //Data Class
 
 class Question{
-  Question({required this.difficulty,required this.description,required this.answer,required this.hint});
+  Question({required this.topic,required this.difficulty,required this.description,required this.answer,required this.hint});
+  String topic;
   String difficulty;
   String description;
   String answer;
@@ -32,10 +33,24 @@ class Chapter{
 class MainAppState extends ChangeNotifier{
   //List of Lessons
   List<Chapter> lessons=[
-    Chapter(chapterName: "Chapter 1", 
-    questionList: [
-      Question(difficulty: "Hard", description: "5+5=?", answer: "10", hint: "Use PEMDAS"),
-      Question(difficulty: "Hard", description: "1000*20343204302302=?", answer: "10", hint: "Use PEMDAS")])];
+    Chapter(
+      chapterName: "Chapter 1: Polynomials", 
+      questionList: [
+        Question(difficulty: "Hard", description: "5+5=?", answer: "10", hint: "Use PEMDAS", topic: "Addition" ),
+        Question(difficulty: "Hard", description: "1000*20343204302302=?", topic: "Addition", answer: "10", hint: "Use PEMDAS")
+        ]
+      ),
+    Chapter(
+      chapterName: "Chapter 2: Matrices", 
+      questionList: [
+        Question(difficulty: "Hard", description: "5+5=?", answer: "10", hint: "Use PEMDAS", topic: "Addition" ),
+        Question(difficulty: "Hard", description: "1000*20343204302302=?", topic: "Addition", answer: "10", hint: "Use PEMDAS")
+        ]
+      )
+
+        ];
+    
+
   int selectedPage=-1;
 
   void changePage(int page){
