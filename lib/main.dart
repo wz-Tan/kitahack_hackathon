@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'chapters_page.dart' as chapters_page;
 import 'question_page.dart' as question_page;
-
+import 'colours.dart' as colours;
+import 'textstyles.dart' as textstyles;
 void main() {
   runApp(const MainApp());
 }
@@ -85,32 +86,56 @@ class MainLayout extends StatefulWidget{
 
 class _MainLayoutState extends State<MainLayout>{
 
+
   @override
   Widget build(BuildContext context) {
-    var selectedPage=context.watch<MainAppState>().selectedPage;
+    var appState=context.watch<MainAppState>();
+    var selectedPage=appState.selectedPage;
+    String topAppBarText;
     Widget displayedPage;
 
     if (selectedPage==-1){
+       topAppBarText="Chapter Selection";
       displayedPage=chapters_page.ChaptersPage();
     }
     else{
+      topAppBarText=appState.lessons[selectedPage].chapterName;
       displayedPage=question_page.QuestionPage(chapterIndex: selectedPage);
     }
     return Scaffold(
-      //Top App Bar, Set Size then the Child (Set to Black Color For Easy Visualisation)
+      //Top App Bar
       appBar: PreferredSize(
-        preferredSize: Size(double.infinity, 0), 
+        preferredSize: Size(double.infinity, 40), 
 
-          //Fill Max parent Size, cannot use expanded since preferred size is not a column row or container
+          
           child: Container(
             width: double.infinity,
             height: double.infinity,
             alignment: Alignment.bottomCenter,
             
-            //Text At Low Center
-            child: Text("",
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white,fontSize: 20),),
+            
+            child: Stack(
+
+              children: [
+                if (selectedPage!=-1)
+                Positioned(
+                  left: 10,
+                  child: IconButton(
+                    onPressed: (){
+                      appState.changePage(-1);
+                    },
+                    icon:Icon(Icons.home), 
+                    color: colours.black)),
+
+                Center(
+                  child: Text(topAppBarText,
+                  style: textstyles.boldedText,)
+                  )
+                
+                
+                
+              ],
+            )
           )),
 
       body:SizedBox(
