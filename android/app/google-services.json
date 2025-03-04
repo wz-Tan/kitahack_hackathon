@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "733016538785",
+    "project_id": "test-9395e",
+    "storage_bucket": "test-9395e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:733016538785:android:ea1a91d29510ecb1fe7ae0",
+        "android_client_info": {
+          "package_name": "com.example.kitahack_hackathon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_v-RvWVJ7l8vB_fRKCFrv58ylBbL_FyY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
