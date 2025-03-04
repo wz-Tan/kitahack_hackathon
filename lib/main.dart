@@ -5,7 +5,18 @@ import 'chapters_page.dart' as chapters_page;
 import 'question_page.dart' as question_page;
 import 'colours.dart' as colours;
 import 'textstyles.dart' as textstyles;
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'firebase_options.dart';
+
+void main() async{
+  //Init plugins
+  WidgetsFlutterBinding.ensureInitialized();
+
+  //Init Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MainApp());
 }
 
@@ -13,7 +24,6 @@ void main() {
 
 
 //Data Class
-
 class Question{
   Question({required this.topic,required this.difficulty,required this.description,required this.answer,required this.hint});
   String topic;
@@ -32,6 +42,9 @@ class Chapter{
 
 //Global App State
 class MainAppState extends ChangeNotifier{
+  //Initialise the firebase client
+  final db = FirebaseFirestore.instance;
+  
   //List of Lessons
   List<Chapter> lessons=[
     Chapter(

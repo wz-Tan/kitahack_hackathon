@@ -1,4 +1,3 @@
-
 import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -23,21 +22,23 @@ gemini_client=genai.Client(api_key=gemini_api_key)
 
  
 #Initialise the JSON Format (BaseModel is used to validate if it matches)
-class lesson(BaseModel):
-    lessonName: str
-    description: str
-    example: str 
-    explanation: str
-    completed: bool 
-    
-class question(BaseModel):
+class Question(BaseModel):
     description :str 
     answer: str
     
+class Lesson(BaseModel):
+    lessonName: str
+    description: str
+    example: str
+    explanation: str
+    completed: bool
+    questions: list[Question]
+    
+
+    
 class Chapter(BaseModel):
     chapterName: str
-    Lessons: list[lesson]=[]
-    Questions: list[question]=[]
+    Lessons: list[Lesson]
 
 chapterList=[]
 
@@ -53,8 +54,9 @@ def firebase_InitContent(name:str):
     
 
 
-def gemini_Testing(age:int,location:str):
-    response=gemini_client.models.generate_content(
+def gemini_Testing(age:int,location:str,username:str):
+    
+    chapters=gemini_client.models.generate_content(
         model="gemini-2.0-flash", 
         contents=f"Generate 12 math chapters for a {age} year old in {location}, Keep the names as simple as possible while keeping a format such as Chapter 1: Multiplication",
         config= {
@@ -63,23 +65,34 @@ def gemini_Testing(age:int,location:str):
         },
     ).text
     
-    response_dict=(json.loads(response))
-    
-    #Create A List Of Chapters
-    for chapter in response_dict:
-        chapterList.append(chapter)
-    
-    #Generate Lessons 
-    for chapter in chapterList:
+    #List of Chapters
+    chapters=(json.loads(chapters))
+
+    for chapter in chapters:
+        #Generate Chapters
         lessons=gemini_client.models.generate_content(
             model="gemini-2.0-flash", 
-            contents=f"According to the chapter name, provide a list of lessons. Provide concrete examples and comprehensive elaborations. Humanise your reply as if you are an actual teacher. This is aimed to help a {age} year old in {location} to understand the local syllabus. The chapter name is {chapter}",
+            contents=f"According to the chapter name, provide a list of lessons. For each lesson, provide 3 suitable practice questions as well. Provide concrete examples and comprehensive elaborations. Humanise your reply as if you are an actual teacher. This is aimed to help a {age} year old in {location} to understand the local syllabus. The chapter name is {chapter}",
             config= {
                 "response_mime_type":"application/json",
-                "response_schema":list[lesson]
+                "response_schema":list[Lesson]
             },
             ).text
-        print("\n\n\nThe lesson for",chapter,"is",lessons)
+        
+        lessons=json.loads(lessons)
+        
+        #Uploading into Firebase
+        for lesson in lessons:
+            (db
+             .collection("Users").document(username)
+             .collection("Chapters").document(chapter)
+             .collection("Lessons").document(lesson["lessonName"])
+             .set(lesson))
+        
+        
+        
+            
+            
+            
     
-    #Generate Questions Left (O n^2)
-    
+gemini_Testing(12,"New York","Sigma")
