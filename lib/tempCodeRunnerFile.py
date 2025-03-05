@@ -1,2 +1,1 @@
-
-    
+db.collection("Users").document(username).update({"latest_set":setNum+1})

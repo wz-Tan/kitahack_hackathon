@@ -43,18 +43,24 @@ class Chapter(BaseModel):
 chapterList=[]
 
 def firebase_CreateUser(name: str,age: int,location: str):
-    db.collection("Users").document(name).set({"age":age,"location":location})
+    db.collection("Users").document(name).set({"age":age,"location":location, "latest_set":0})
     
 
-def firebase_InitContent(name:str):
-    userInfo=db.collection("Users").document(name).get().to_dict()
+
+
+def generateQuestions(username:str):
+    
+    #Retrieve User Info
+    userInfo=db.collection("Users").document(username).get().to_dict()
     age=userInfo["age"]
     location=userInfo["location"]
-    gemini_Testing(age=age,location=location)
+    setNum=userInfo["latest_set"]
     
-
-
-def gemini_Testing(age:int,location:str,username:str):
+    #Assign New Set
+    db.collection("Users").document(username).update({"latest_set":setNum+1})
+    destination=(db
+             .collection("Users").document(username)
+             .collection(f"Set {setNum+1}"))
     
     chapters=gemini_client.models.generate_content(
         model="gemini-2.0-flash", 
@@ -83,16 +89,9 @@ def gemini_Testing(age:int,location:str,username:str):
         
         #Uploading into Firebase
         for lesson in lessons:
-            (db
-             .collection("Users").document(username)
-             .collection("Chapters").document(chapter)
+            (destination.document(chapter)
              .collection("Lessons").document(lesson["lessonName"])
-             .set(lesson))
+             .set(lesson)
+             )
         
-        
-        
-            
-            
-            
-    
-gemini_Testing(12,"New York","Sigma")
+generateQuestions("Youtube Tan")
