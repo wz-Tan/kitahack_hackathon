@@ -87,11 +87,17 @@ def generateQuestions(username:str):
         
         lessons=json.loads(lessons)
         
-        #Uploading into Firebase
+        #Initialise the Document For Insertion
+        destination.document(chapter).set({"completed":"false"})
+        
+        #Uploading into Firebase 
         for lesson in lessons:
-            (destination.document(chapter)
+                
+            (destination
+             .document(chapter)
              .collection("Lessons").document(lesson["lessonName"])
              .set(lesson)
              )
         
-firebase_CreateUser("JohN",2,"Indonesia")
+        
+generateQuestions("Youtube Tan")

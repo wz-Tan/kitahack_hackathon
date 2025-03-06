@@ -126,28 +126,22 @@ class MainAppState extends ChangeNotifier {
     dynamic setPath = db
         .collection("Users")
         .doc(username)
-        .collection("Set 1");
+        .collection("Set $latestSet");
 
-    dynamic chapters;
-    //Get Chapters - Still In Progress
-    chapters = await setPath
-        .doc("Chapter 1: Algebra Basics")
-        .collection("Lessons")
+    List<String> chapters=[];
+
+    //Get Chapter ID  (Create Chapter Card For Each)
+    await setPath
         .get()
         .then(
           (QuerySnapshot query) {
-          return query.docs;
+            for (var doc in query.docs){
+              chapters.add(doc.id);
+            }
         }
-        );
-    
-    var chapterList=[];
-    
-    for (var chapter in chapters){
-      chapterList.add(chapter.data());
-    }
+      );
 
-    print(chapterList);
-
+    print(chapters);
 
     
   }
