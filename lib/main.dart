@@ -1,5 +1,5 @@
 import 'dart:collection';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'chapters_page.dart' as chapters_page;
@@ -13,12 +13,22 @@ import 'firebase_options.dart';
 void main() async {
   //Init plugins
   WidgetsFlutterBinding.ensureInitialized();
+  //Load Env File
+  await dotenv.load(fileName: ".env");
 
   //Init Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MainApp());
 }
 
+//API Key provider for firebase options
+class EnvProvider{
+  //Getter for firebase options
+  static String get googleAPIKey{
+    return dotenv.env["google_api_key"] ?? "Not Retrieved";
+  }
+
+}
 //Data Class
 class Question {
   Question({
@@ -129,32 +139,17 @@ class MainAppState extends ChangeNotifier {
           return query.docs;
         }
         );
-    print(chapters);
+    
+    var chapterList=[];
+    
+    for (var chapter in chapters){
+      chapterList.add(chapter.data());
+    }
 
-    //   (querySnapshot){
-    //     print("Chapters retrieved");
-    //     print(querySnapshot.docs);
-    //     for (var docSnapshot in querySnapshot.docs){
-    //       print('${docSnapshot.id} => ${docSnapshot.data()}');
-    //     }
-    //   },
-    //   onError: (e) => print("Error completing: $e"),
-    // );
+    print(chapterList);
 
-    print("Set $latestSet");
 
-    //Retrieve the chapter names first, then display. When clicked then we retrieve the necessary lessons. Then when lesson clicked display the data. All separate calls.
-
-    // final selectedSet=userInfo.latest_set;
-    // .then(
-    //   //takes in the returned raw data
-    //   (querySnapshot) {
-    //     for (var docSnapshot in querySnapshot.docs) {
-    //       print('${docSnapshot.id} => ${docSnapshot.data()}');
-    //     }
-    //   },
-    //   onError: (e) => print("Error completing: $e"),
-    // );
+    
   }
 }
 
