@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import os
 
 #Load the Env File
-load_dotenv()
+load_dotenv(dotenv_path=".env")
 gemini_api_key=os.getenv("gemini_api_key")
 firebase_credential_path=os.getenv("firebase_credential_path")
 
@@ -94,4 +94,4 @@ def generateQuestions(username:str):
              .set(lesson)
              )
         
-generateQuestions("Youtube Tan")
+firebase_CreateUser("JohN",2,"Indonesia")
