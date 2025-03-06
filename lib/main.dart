@@ -1,3 +1,5 @@
+import 'dart:collection';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'chapters_page.dart' as chapters_page;
@@ -11,12 +13,22 @@ import 'firebase_options.dart';
 void main() async {
   //Init plugins
   WidgetsFlutterBinding.ensureInitialized();
+  //Load Env File
+  await dotenv.load(fileName: ".env");
 
   //Init Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MainApp());
 }
 
+//API Key provider for firebase options
+class EnvProvider{
+  //Getter for firebase options
+  static String get googleAPIKey{
+    return dotenv.env["google_api_key"] ?? "Not Retrieved";
+  }
+
+}
 //Data Class
 class Question {
   Question({
@@ -43,9 +55,10 @@ class Chapter {
 class MainAppState extends ChangeNotifier {
   //Initialise the firebase client
   final db = FirebaseFirestore.instance;
+  
 
-  //Username needs to be from token. 
-  final username="Youtube Tan";
+  //Username needs to be from token.
+  final username = "Youtube Tan";
 
   //List of Lessons
   List<Chapter> lessons = [
@@ -97,31 +110,46 @@ class MainAppState extends ChangeNotifier {
   }
 
   //Get data from firestore
-  Future getData() async{
+  Future getData() async {
+    dynamic userInfo;
 
-    var userInfo;
-    
     //Acquire User Info
-    await db.collection("Users").doc(username).get().then(
-      (DocumentSnapshot doc){
-        userInfo=doc.data();
-      }
-    );
+    await db.collection("Users").doc(username).get().then((
+      DocumentSnapshot doc,
+    ) {
+      userInfo = doc.data();
+    });
 
-    int latest_set=userInfo["latest_set"];
-    
-    // final selectedSet=userInfo.latest_set;
-    // .then(
-    //   //takes in the returned raw data
-    //   (querySnapshot) {
-    //     for (var docSnapshot in querySnapshot.docs) {
-    //       print('${docSnapshot.id} => ${docSnapshot.data()}');
-    //     }
-    //   },
-    //   onError: (e) => print("Error completing: $e"),
-    // );
-    
+    int latestSet = userInfo["latest_set"];
 
+    //Get Set Path to Run Faster 
+    dynamic setPath = db
+        .collection("Users")
+        .doc(username)
+        .collection("Set 1");
+
+    dynamic chapters;
+    //Get Chapters - Still In Progress
+    chapters = await setPath
+        .doc("Chapter 1: Algebra Basics")
+        .collection("Lessons")
+        .get()
+        .then(
+          (QuerySnapshot query) {
+          return query.docs;
+        }
+        );
+    
+    var chapterList=[];
+    
+    for (var chapter in chapters){
+      chapterList.add(chapter.data());
+    }
+
+    print(chapterList);
+
+
+    
   }
 }
 
