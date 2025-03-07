@@ -55,7 +55,6 @@ class Chapter {
 class MainAppState extends ChangeNotifier {
   //Initialise the firebase client
   final db = FirebaseFirestore.instance;
-  
 
   //Username needs to be from token.
   final username = "Youtube Tan";
@@ -81,36 +80,15 @@ class MainAppState extends ChangeNotifier {
         ),
       ],
     ),
-    Chapter(
-      chapterName: "Chapter 2: Matrices",
-      questionList: [
-        Question(
-          difficulty: "Hard",
-          description: "5+5=?",
-          answer: "10",
-          hint: "Use PEMDAS",
-          topic: "Addition",
-        ),
-        Question(
-          difficulty: "Hard",
-          description: "1000*20343204302302=?",
-          topic: "Addition",
-          answer: "10",
-          hint: "Use PEMDAS",
-        ),
-      ],
-    ),
   ];
 
   int selectedPage = -1;
-
-  void changePage(int page) {
-    selectedPage = page;
-    notifyListeners();
-  }
+  late int latestSet;
+  late dynamic setPath;
+  late List<String> chapterList=[];
 
   //Get data from firestore
-  Future getData() async {
+  Future initData() async {
     dynamic userInfo;
 
     //Acquire User Info
@@ -120,15 +98,13 @@ class MainAppState extends ChangeNotifier {
       userInfo = doc.data();
     });
 
-    int latestSet = userInfo["latest_set"];
+    latestSet = userInfo["latest_set"];
 
     //Get Set Path to Run Faster 
-    dynamic setPath = db
+    setPath = db
         .collection("Users")
         .doc(username)
         .collection("Set $latestSet");
-
-    List<String> chapters=[];
 
     //Get Chapter ID  (Create Chapter Card For Each)
     await setPath
@@ -136,15 +112,26 @@ class MainAppState extends ChangeNotifier {
         .then(
           (QuerySnapshot query) {
             for (var doc in query.docs){
-              chapters.add(doc.id);
+              chapterList.add(doc.id);
             }
         }
       );
-
-    print(chapters);
-
     
+    //Sort based on chapter number  (Split between spaces then retrieve the 2nd index, which is the number)
+    chapterList.sort((a,b){
+      int numA=int.parse(a.split(" ")[1].replaceAll(":", ""));
+      int numB=int.parse(b.split(" ")[1].replaceAll(":", ""));
+      return numA.compareTo(numB);
+    });
+
   }
+
+  void changePage(int page) {
+    selectedPage = page;
+    notifyListeners();
+  }
+
+  
 }
 
 //Main App, Prepares State and Prompts Main Layout
@@ -164,15 +151,20 @@ class MainApp extends StatelessWidget {
 //Main Layout, Requires State to Navigate
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
+
   @override
   State<MainLayout> createState() => _MainLayoutState();
 }
 
-class _MainLayoutState extends State<MainLayout> {
+class _MainLayoutState extends State<MainLayout>{
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
+
     var appState = context.watch<MainAppState>();
-    appState.getData();
+    //Initialise From Database When First Building
+    WidgetsBinding.instance.addPostFrameCallback((_)=>appState.initData());
+    
     var selectedPage = appState.selectedPage;
     String topAppBarText;
     Widget displayedPage;
@@ -184,6 +176,7 @@ class _MainLayoutState extends State<MainLayout> {
       topAppBarText = appState.lessons[selectedPage].chapterName;
       displayedPage = question_page.QuestionPage(chapterIndex: selectedPage);
     }
+    
     return Scaffold(
       //Top App Bar
       appBar: PreferredSize(
