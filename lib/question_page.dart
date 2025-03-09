@@ -14,7 +14,7 @@ class QuestionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     //Take In Question List From Main
     var questionList =
-        context.watch<main.MainAppState>().lessons[chapterIndex].questionList;
+        context.watch<main.MainAppState>().chapterList;
 
     return Container(
       color: Color(0xFFFFFFFF),
@@ -28,7 +28,7 @@ class QuestionPage extends StatelessWidget {
 //Actual Contents, Receives Question List, Important for Navigation
 class Contents extends StatefulWidget {
   const Contents({super.key, required this.questionList});
-  final List<main.Question> questionList;
+  final List<String> questionList;
 
   @override
   State<Contents> createState() => _ContentsState();
@@ -44,10 +44,7 @@ class _ContentsState extends State<Contents> {
     var questionList = widget.questionList;
     var currQuestion = questionList[questionIndex];
 
-    String description = currQuestion.description;
-    String difficulty = currQuestion.difficulty;
-    String answer = currQuestion.answer;
-    String hint = currQuestion.hint;
+    
 
     return SizedBox(
       width: double.infinity,
@@ -116,7 +113,7 @@ class _ContentsState extends State<Contents> {
           //Contents
           Padding(
             padding: EdgeInsets.all(10),
-            child: Text(description, style: textstyles.boldedText),
+            child: Text("Hello", style: textstyles.boldedText),
             
           ),
         ],

@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import os
 
 #Load the Env File
-load_dotenv()
+load_dotenv(dotenv_path=".env")
 gemini_api_key=os.getenv("gemini_api_key")
 firebase_credential_path=os.getenv("firebase_credential_path")
 
@@ -87,11 +87,17 @@ def generateQuestions(username:str):
         
         lessons=json.loads(lessons)
         
-        #Uploading into Firebase
+        #Initialise the Document For Insertion
+        destination.document(chapter).set({"completed":"false"})
+        
+        #Uploading into Firebase 
         for lesson in lessons:
-            (destination.document(chapter)
+                
+            (destination
+             .document(chapter)
              .collection("Lessons").document(lesson["lessonName"])
              .set(lesson)
              )
+        
         
 generateQuestions("Youtube Tan")
