@@ -93,7 +93,6 @@ class MainAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  
 }
 
 //Main App, Prepares State and Prompts Main Layout

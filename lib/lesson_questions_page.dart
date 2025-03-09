@@ -5,7 +5,7 @@ import 'textstyles.dart' as textstyles;
 import 'lesson_selection.dart' as lesson_selection;
 import 'main.dart' as main;
 
-//Something wrong here
+//Something wrong here -> Empty List is Returned 
 Future <List<String>> retrieveLessons(path) async{
   List<String> lessonList = [];
   await path.collection("Lessons").get().then((querySnapshot) {
@@ -89,12 +89,12 @@ class _LessonQuestionsState extends State<LessonQuestionsPage> {
         future: retrieveLessons(path), 
         builder: (BuildContext context,AsyncSnapshot snapshot){
           if (snapshot.hasData){
-            return lesson_selection.LessonSelectionPage(lessonList: snapshot.data);
+            return lesson_selection.LessonSelectionPage(lessonList: snapshot.data, lessonsPath: path.collection("Lessons"));
           }
           else if(snapshot.hasError){
             return Text('Failed');
           }
-          return LinearProgressIndicator(value: null, borderRadius: BorderRadius.circular(360),);
+          return Text("Loading...");
       }
       );
     }
