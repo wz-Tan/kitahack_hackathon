@@ -1,9 +1,10 @@
-import 'dart:collection';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'chapters_page.dart' as chapters_page;
 import 'question_page.dart' as question_page;
+import 'lesson_questions_page.dart' as lesson_question_selection_page;
 import 'colours.dart' as colours;
 import 'textstyles.dart' as textstyles;
 import 'package:firebase_core/firebase_core.dart';
@@ -13,6 +14,7 @@ import 'firebase_options.dart';
 void main() async {
   //Init plugins
   WidgetsFlutterBinding.ensureInitialized();
+
   //Load Env File
   await dotenv.load(fileName: ".env");
 
@@ -29,27 +31,6 @@ class EnvProvider{
   }
 
 }
-//Data Class
-class Question {
-  Question({
-    required this.topic,
-    required this.difficulty,
-    required this.description,
-    required this.answer,
-    required this.hint,
-  });
-  String topic;
-  String difficulty;
-  String description;
-  String answer;
-  String hint;
-}
-
-class Chapter {
-  Chapter({required this.chapterName, required this.questionList});
-  String chapterName;
-  List<Question> questionList;
-}
 
 //Global App State
 class MainAppState extends ChangeNotifier {
@@ -59,33 +40,12 @@ class MainAppState extends ChangeNotifier {
   //Username needs to be from token.
   final username = "Youtube Tan";
 
-  //List of Lessons
-  List<Chapter> lessons = [
-    Chapter(
-      chapterName: "Chapter 1: Polynomials",
-      questionList: [
-        Question(
-          difficulty: "Hard",
-          description: "5+5=?",
-          answer: "10",
-          hint: "Use PEMDAS",
-          topic: "Addition",
-        ),
-        Question(
-          difficulty: "Hard",
-          description: "1000*20343204302302=?",
-          topic: "Addition",
-          answer: "10",
-          hint: "Use PEMDAS",
-        ),
-      ],
-    ),
-  ];
-
   int selectedPage = -1;
   late int latestSet;
   late dynamic setPath;
   late List<String> chapterList=[];
+  late String currChapter;
+  bool isLoading=true;
 
   //Get data from firestore
   Future initData() async {
@@ -124,6 +84,8 @@ class MainAppState extends ChangeNotifier {
       return numA.compareTo(numB);
     });
 
+    isLoading=false;
+    notifyListeners();
   }
 
   void changePage(int page) {
@@ -147,7 +109,6 @@ class MainApp extends StatelessWidget {
   }
 }
 
-//Create App State and App, Then Set the Child as the layout, then set child of layout as page
 //Main Layout, Requires State to Navigate
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -159,24 +120,34 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout>{
 
   @override
+  void initState() {
+    super.initState();
+    Provider.of<MainAppState>(context,listen: false).initData();
+  }
+
+  @override
   Widget build(BuildContext context){
 
     var appState = context.watch<MainAppState>();
-    //Initialise From Database When First Building
-    WidgetsBinding.instance.addPostFrameCallback((_)=>appState.initData());
-    
+    //Initialise From Database When First Building    
     var selectedPage = appState.selectedPage;
     String topAppBarText;
     Widget displayedPage;
 
     if (selectedPage == -1) {
-      topAppBarText = "Chapter Selection";
+      topAppBarText = "Home Page";
       displayedPage = chapters_page.ChaptersPage();
-    } else {
-      topAppBarText = appState.lessons[selectedPage].chapterName;
-      displayedPage = question_page.QuestionPage(chapterIndex: selectedPage);
     }
     
+    else if (selectedPage==0){
+      topAppBarText=appState.currChapter;
+      displayedPage=lesson_question_selection_page.LessonQuestionsPage(chapterName: appState.currChapter);
+    }
+    else{
+      topAppBarText="No Contents Yet";
+      displayedPage=chapters_page.ChaptersPage();
+    }
+
     return Scaffold(
       //Top App Bar
       appBar: PreferredSize(
@@ -191,7 +162,8 @@ class _MainLayoutState extends State<MainLayout>{
             children: [
               if (selectedPage != -1)
                 Positioned(
-                  left: 10,
+                  right: 10,
+                  bottom: 5,
                   child: IconButton(
                     onPressed: () {
                       appState.changePage(-1);
@@ -201,7 +173,11 @@ class _MainLayoutState extends State<MainLayout>{
                   ),
                 ),
 
-              Center(child: Text(topAppBarText, style: textstyles.boldedText)),
+              Positioned(
+                left: 10,
+                bottom: 5,
+                child: Text(topAppBarText,style:textstyles.boldedText)
+              ),
             ],
           ),
         ),

@@ -3,27 +3,36 @@ import 'package:provider/provider.dart';
 import 'colours.dart' as colours;
 import 'main.dart' as main;
 
+
 //Chapters Page
 class ChaptersPage extends StatelessWidget {
   const ChaptersPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var lessons = context.watch<main.MainAppState>().lessons;
+    var appState=context.watch<main.MainAppState>();
+
+    if (appState.isLoading){
+      return LinearProgressIndicator(value: 2,);
+    }
+
+    List<String> chapters = appState.chapterList;
 
     //Padding, Sized Box then Column
     return SizedBox(
       width: double.infinity,
       height: double.infinity,
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
         children: [
-          for (var lesson in lessons.indexed)
+          for (var chapter in chapters)
             ChapterSelectionBox(
-              chapterName: lesson.$2.chapterName,
-              index: lesson.$1,
+              chapterName: chapter
             ),
         ],
       ),
+      )
+      
     );
   }
 }
@@ -33,17 +42,17 @@ class ChapterSelectionBox extends StatelessWidget {
   const ChapterSelectionBox({
     super.key,
     required this.chapterName,
-    required this.index,
   });
+
   final String chapterName;
-  final int index;
 
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<main.MainAppState>();
     return GestureDetector(
       onTap: () {
-        appState.changePage(index);
+        appState.changePage(0);
+        appState.currChapter=chapterName;
       },
       child: Container(
         width: double.infinity,
@@ -55,6 +64,7 @@ class ChapterSelectionBox extends StatelessWidget {
           ),
         ),
 
+        //The Box For Each Chapter
         child: Stack(
           alignment: AlignmentDirectional.centerStart,
           children: [
