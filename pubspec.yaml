@@ -23,3 +23,15 @@ flutter:
   uses-material-design: true
   assets:
     - .env
+
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins-Bold.ttf
+          weight: 700
+        - asset: fonts/Poppins-Bold.ttf
+          weight: 500
+        - asset: fonts/Poppins-Bold.ttf
+          weight: 400
+        - asset: fonts/Poppins-Bold.ttf
+          weight: 600
