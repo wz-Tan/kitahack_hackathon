@@ -13,7 +13,7 @@ class ChaptersPage extends StatelessWidget {
     var appState=context.watch<main.MainAppState>();
 
     if (appState.isLoading){
-      return LinearProgressIndicator(value: 2,);
+      return Text("Loading...");
     }
 
     List<String> chapters = appState.chapterList;

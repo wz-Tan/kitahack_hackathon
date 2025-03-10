@@ -24,7 +24,9 @@ gemini_client=genai.Client(api_key=gemini_api_key)
 #Initialise the JSON Format (BaseModel is used to validate if it matches)
 class Question(BaseModel):
     description :str 
+    working: str
     answer: str
+    choices: list[str]
     
 class Lesson(BaseModel):
     lessonName: str
@@ -78,7 +80,7 @@ def generateQuestions(username:str):
         #Generate Chapters
         lessons=gemini_client.models.generate_content(
             model="gemini-2.0-flash", 
-            contents=f"According to the chapter name, provide a list of lessons. For each lesson, provide 3 suitable practice questions as well. Provide concrete examples and comprehensive elaborations. Humanise your reply as if you are an actual teacher. This is aimed to help a {age} year old in {location} to understand the local syllabus. The chapter name is {chapter}",
+            contents=f"According to the chapter name, provide a list of lessons. For each lesson, provide 3 suitable practice questions as well. Each question should be provided with the working for the solution of the question. Provide 4 choices for each answer, one has to contain the actual answer. At the sam Provide concrete examples and comprehensive elaborations. Humanise your reply as if you are an actual teacher. This is aimed to help a {age} year old in {location} to understand the local syllabus. The chapter name is {chapter}",
             config= {
                 "response_mime_type":"application/json",
                 "response_schema":list[Lesson]
@@ -99,5 +101,4 @@ def generateQuestions(username:str):
              .set(lesson)
              )
         
-        
-generateQuestions("Youtube Tan")
+generateQuestions("Wz")
