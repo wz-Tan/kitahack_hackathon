@@ -3,7 +3,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'chapters_page.dart' as chapters_page;
-import 'question_page.dart' as question_page;
 import 'lesson_questions_page.dart' as lesson_question_selection_page;
 import 'colours.dart' as colours;
 import 'textstyles.dart' as textstyles;
@@ -38,7 +37,7 @@ class MainAppState extends ChangeNotifier {
   final db = FirebaseFirestore.instance;
 
   //Username needs to be from token.
-  final username = "Youtube Tan";
+  final username = "Wz";
 
   int selectedPage = -1;
   late int latestSet;

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kitahack_hackathon/colours.dart';
-import 'package:provider/provider.dart';
-import 'main.dart' as main;
 import 'lesson_page.dart' as lesson_page;
 
 //Fetch Info of Selected Lesson
