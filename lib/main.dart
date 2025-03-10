@@ -9,6 +9,7 @@ import 'textstyles.dart' as textstyles;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
+import 'login_page.dart' as login_page;
 
 void main() async {
   //Init plugins
@@ -38,6 +39,9 @@ class MainAppState extends ChangeNotifier {
 
   //Username needs to be from token.
   final username = "Wz";
+
+  //See if logged in, check token
+  bool loggedIn=false;
 
   int selectedPage = -1;
   late int latestSet;
@@ -117,6 +121,7 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout>{
 
+  //Init db
   @override
   void initState() {
     super.initState();
@@ -127,7 +132,10 @@ class _MainLayoutState extends State<MainLayout>{
   Widget build(BuildContext context){
 
     var appState = context.watch<MainAppState>();
-    //Initialise From Database When First Building    
+    if (appState.loggedIn==false){
+      return login_page.LoginPage();
+    }
+    
     var selectedPage = appState.selectedPage;
     String topAppBarText;
     Widget displayedPage;
