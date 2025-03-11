@@ -1,23 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:kitahack_hackathon/register_page.dart';
+import 'package:kitahack_hackathon/login_page.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
-
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  //0 for Sign In, 1 for Registration, 2 for Fill In Info
-  int currPage = 0;
+class RegisterPage extends StatelessWidget {
+  const RegisterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    String errorMessage = "";
-
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SafeArea(
@@ -28,17 +16,17 @@ class _LoginPageState extends State<LoginPage> {
 
               //----------Title----------//
               Text(
-                'kitaLearn',
+                'Create Account',
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xff002abc),
+                  color: Color(0xff000abc),
                 ),
               ),
               SizedBox(height: 10),
 
               Text(
-                "Welcome back you've been missed!",
+                "Fun way to learn!",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -49,8 +37,6 @@ class _LoginPageState extends State<LoginPage> {
               //----------Email TextField----------//
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
-
-                //Email Container
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
@@ -60,7 +46,6 @@ class _LoginPageState extends State<LoginPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: TextField(
-                      controller: emailController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Email',
@@ -74,19 +59,15 @@ class _LoginPageState extends State<LoginPage> {
               //----------Password TextField----------//
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                //Password Container
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
                     border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(12),
                   ),
-
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
-                    //Password TextField
                     child: TextField(
-                      controller: passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -96,64 +77,24 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 50),
+              SizedBox(height: 20),
 
-
-              //----------Button----------//
+              //----------Confirm Password TextField----------//
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
-
                 child: Container(
-                  padding: EdgeInsets.all(12),
-
-                child: GestureDetector(
-                  onTap: () async {
-                    if (!validEmail(emailController.text)) {
-                      errorMessage = "Invalid Email Format";
-                    } else if (passwordController.text == "") {
-                      errorMessage = "Password is Empty";
-                    } else {
-                      //Run Email Authentication Here
-                      errorMessage = await auth.AuthHandler().register(
-                        emailController.text,
-                        passwordController.text,
-                      );
-                    }
-
-                    //Return Toast Notif
-                    if (errorMessage != "success") {
-                      Fluttertoast.showToast(
-                        msg: errorMessage,
-                        toastLength: Toast.LENGTH_LONG,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.red,
-                        textColor: Colors.white,
-                        fontSize: 16.0,
-                      );
-                    }
-
-                    else{
-                      //Gather User Info
-                      userInfoInputPage();
-                    }
-                  },
-
-                  child: Container(
-                  padding: EdgeInsets.all(20),
-
                   decoration: BoxDecoration(
-                    color: Color(0xff002abc),
+                    color: Colors.grey[200],
+                    border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(12),
-                    ),
-                  child: Center(
-                    child: Text(
-                      'Sign in',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: TextField(
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'Confirm Password',
                       ),
                     ),
                   ),
@@ -161,16 +102,38 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 50),
 
-              //----------Create new account----------//
+              //----------Button----------//
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Color(0xff002abc),
+                    borderRadius: BorderRadius.circular(12),
+                    ),
+                  child: Center(
+                    child: Text(
+                      'Sign up',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        ),
+                      ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 50),
+
               GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => RegisterPage()),
+                    MaterialPageRoute(builder: (context) => LoginPage()),
                   );
                 },
                 child: Text(
-                  'Create new account',
+                  'Already have an account',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   )
@@ -182,10 +145,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-}
-
-bool validEmail(emailInput) {
-  return RegExp(
-    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-  ).hasMatch(emailInput);
 }
