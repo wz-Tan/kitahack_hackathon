@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kitahack_hackathon/register_page.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'auth.dart' as auth;
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-
-    final emailController=TextEditingController();
-    final passwordController=TextEditingController();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    String errorMessage = "";
 
     return Scaffold(
       backgroundColor: Colors.grey[300],
@@ -17,7 +19,6 @@ class LoginPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
               //----------Title----------//
               Text(
                 'kitaLearn',
@@ -31,10 +32,7 @@ class LoginPage extends StatelessWidget {
 
               Text(
                 "Welcome back you've been missed!",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 50),
 
@@ -73,7 +71,7 @@ class LoginPage extends StatelessWidget {
                     border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  
+
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     //Password TextField
@@ -90,7 +88,6 @@ class LoginPage extends StatelessWidget {
               ),
               SizedBox(height: 50),
 
-
               //----------Button----------//
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
@@ -98,38 +95,56 @@ class LoginPage extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.all(12),
 
-                child: GestureDetector(
-                  onTap: (){
-                    if (!validEmail(emailController.text)){
-                      print("Invalid Email Format");
-                    }
-                    else if(passwordController.text!=""){
-                      print("Password Is Empty");
-                    }
-                    else{
-                      //Run Email Authentication Here
-                    }
-                  },
-                  child: Container(
-                  padding: EdgeInsets.all(20),
+                  child: GestureDetector(
+                    onTap: () async {
+                      if (!validEmail(emailController.text)) {
+                        errorMessage = "Invalid Email Format";
+                      } else if (passwordController.text == "") {
+                        errorMessage = "Password is Empty";
+                      } else {
+                        //Run Email Authentication Here
+                        errorMessage = await auth.AuthHandler().register(
+                          emailController.text,
+                          passwordController.text,
+                        );
+                      }
 
-                  decoration: BoxDecoration(
-                    color: Color(0xff002abc),
-                    borderRadius: BorderRadius.circular(12),
-                    ),
-                  child: Center(
-                    child: Text(
-                      'Sign in',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                      //Return Toast Notif
+                      if (errorMessage != "success") {
+                        Fluttertoast.showToast(
+                          msg: errorMessage,
+                          toastLength: Toast.LENGTH_LONG,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.red,
+                          textColor: Colors.white,
+                          fontSize: 16.0,
+                        );
+                      } else {
+                        //Gather User Info
+                      }
+                    },
+
+                    child: Container(
+                      padding: EdgeInsets.all(20),
+
+                      decoration: BoxDecoration(
+                        color: Color(0xff002abc),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Sign in',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
+                    ),
                   ),
                 ),
-                )
-                
               ),
               SizedBox(height: 50),
 
@@ -143,9 +158,7 @@ class LoginPage extends StatelessWidget {
                 },
                 child: Text(
                   'Create new account',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  )
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -154,8 +167,10 @@ class LoginPage extends StatelessWidget {
       ),
     );
   }
-}
 
-bool validEmail(emailInput){
-  return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(emailInput);
+  bool validEmail(emailInput) {
+    return RegExp(
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    ).hasMatch(emailInput);
+  }
 }

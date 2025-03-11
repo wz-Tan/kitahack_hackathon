@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kitahack_hackathon/colours.dart';
 import 'lesson_page.dart' as lesson_page;
+import 'dart:developer';
 
 //Fetch Info of Selected Lesson
 Future<dynamic> retrieveLessonInfo(lessonPath) async {
@@ -67,7 +68,7 @@ class _LessonSelectionPageState extends State<LessonSelectionPage> {
             return lesson_page.LessonPage(lessonInfo: snapshot.data);
           }
           else if (snapshot.hasError){
-            print(snapshot.error);
+            log(snapshot.error.toString());
           }
           return Text("Loading Lesson Info");
         }
