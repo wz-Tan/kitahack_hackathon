@@ -17,7 +17,16 @@ class AuthHandler{
     
   }
 
-  void signIn(){
-
+  Future<String> signIn(email,password) async{
+    
+    try{
+      FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email, 
+        password: password);
+        return "success";
+    }
+    on FirebaseAuthException catch(e){
+      return e.code;
+    }
   }
 }
