@@ -1,9 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import 'dart:developer';
+import 'auth.dart' as auth;
+import 'main.dart' as main;
 
-class LoginPage extends StatelessWidget {
+void userInfoInputPage(){
+  log("Collecting User Info Page Is Shown.");
+  //Once This is Completed, Call the Create User Function In Auth.dart
+}
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  //0 for Sign In, 1 for Registration, 2 for Fill In Info
+  int currPage = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -78,36 +93,34 @@ class LoginPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: GestureDetector(
                   onTap: () async {
-
                     if (!validEmail(emailController.text)) {
                       errorMessage = "Invalid Email Format";
                     } else if (passwordController.text == "") {
                       errorMessage = "Password is Empty";
                     } else {
                       //Run Email Authentication Here
-                       try {
-                        await FirebaseAuth.instance
-                            .createUserWithEmailAndPassword(
-                              email: emailController.text,
-                              password: passwordController.text,
-                            );
-                            errorMessage="";
-                      } on FirebaseAuthException catch (e) {
-                        errorMessage = e.code;
-                      }
+                      errorMessage = await auth.AuthHandler().register(
+                        emailController.text,
+                        passwordController.text,
+                      );
                     }
 
                     //Return Toast Notif
-                    if (errorMessage != "") {
+                    if (errorMessage != "success") {
                       Fluttertoast.showToast(
                         msg: errorMessage,
-                        toastLength: Toast.LENGTH_SHORT,
+                        toastLength: Toast.LENGTH_LONG,
                         gravity: ToastGravity.CENTER,
                         timeInSecForIosWeb: 1,
                         backgroundColor: Colors.red,
                         textColor: Colors.white,
                         fontSize: 16.0,
                       );
+                    }
+
+                    else{
+                      //Gather User Info
+                      userInfoInputPage();
                     }
                   },
 
@@ -139,11 +152,18 @@ class LoginPage extends StatelessWidget {
                     'Not a member?',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  Text(
-                    ' Register Now',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        currPage = 1;
+                      });
+                    },
+                    child: Text(
+                      ' Register Now',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],

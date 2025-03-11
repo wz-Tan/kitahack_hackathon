@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kitahack_hackathon/colours.dart';
+import 'dart:developer';
 
 class LessonPage extends StatefulWidget {
   const LessonPage({super.key, required this.lessonInfo});
@@ -19,7 +20,7 @@ class _LessonPageState extends State<LessonPage> {
     var questionList=widget.lessonInfo["questions"];
 
     //Print to Test the Variable
-    print(widget.lessonInfo);
+    log(widget.lessonInfo);
     //Display Question Page Here
     return Padding(
       padding: EdgeInsets.fromLTRB(10, 10, 10, 0),

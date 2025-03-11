@@ -43,12 +43,19 @@ class MainAppState extends ChangeNotifier {
   //See if logged in, check token
   bool loggedIn=false;
 
+  //0 For Main Page, 1 for Chapter Selected
   int selectedPage = -1;
   late int latestSet;
   late dynamic setPath;
   late List<String> chapterList=[];
   late String currChapter;
   bool isLoading=true;
+
+  void notifyLoggedIn(){
+    loggedIn=true;
+
+    notifyListeners();
+  }
 
   //Get data from firestore
   Future initData() async {
@@ -125,13 +132,13 @@ class _MainLayoutState extends State<MainLayout>{
   @override
   void initState() {
     super.initState();
-    Provider.of<MainAppState>(context,listen: false).initData();
+    Provider.of<MainAppState>(context,listen: true).initData();
   }
 
   @override
   Widget build(BuildContext context){
-
     var appState = context.watch<MainAppState>();
+
     if (appState.loggedIn==false){
       return login_page.LoginPage();
     }
@@ -140,12 +147,12 @@ class _MainLayoutState extends State<MainLayout>{
     String topAppBarText;
     Widget displayedPage;
 
-    if (selectedPage == -1) {
+    if (selectedPage == 0) {
       topAppBarText = "Home Page";
       displayedPage = chapters_page.ChaptersPage();
     }
     
-    else if (selectedPage==0){
+    else if (selectedPage==-1){
       topAppBarText=appState.currChapter;
       displayedPage=lesson_question_selection_page.LessonQuestionsPage(chapterName: appState.currChapter);
     }
