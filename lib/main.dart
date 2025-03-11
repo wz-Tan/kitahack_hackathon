@@ -10,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'login_page.dart' as login_page;
+import 'backend.dart' as backend;
 
 void main() async {
   //Init plugins
@@ -17,6 +18,7 @@ void main() async {
 
   //Load Env File
   await dotenv.load(fileName: ".env");
+
 
   //Init Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -29,7 +31,6 @@ class EnvProvider{
   static String get googleAPIKey{
     return dotenv.env["google_api_key"] ?? "Not Retrieved";
   }
-
 }
 
 //Global App State
@@ -139,6 +140,7 @@ class _MainLayoutState extends State<MainLayout>{
     var appState = context.watch<MainAppState>();
 
     if (appState.loggedIn==false){
+      backend.initGemini();
       return login_page.LoginPage();
     }
     
