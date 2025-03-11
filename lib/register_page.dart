@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:kitahack_hackathon/login_page.dart';
+import 'auth.dart' as auth;
+import 'user_info_page.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final passwordCheckController = TextEditingController();
+    String errorMessage = "";
+
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SafeArea(
@@ -13,7 +20,6 @@ class RegisterPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
               //----------Title----------//
               Text(
                 'Create Account',
@@ -27,10 +33,7 @@ class RegisterPage extends StatelessWidget {
 
               Text(
                 "Fun way to learn!",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 50),
 
@@ -46,6 +49,7 @@ class RegisterPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: TextField(
+                      controller: emailController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Email',
@@ -68,6 +72,7 @@ class RegisterPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: TextField(
+                      controller: passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -91,6 +96,7 @@ class RegisterPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: TextField(
+                      controller: passwordCheckController,
                       obscureText: true,
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -105,21 +111,62 @@ class RegisterPage extends StatelessWidget {
               //----------Button----------//
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Color(0xff002abc),
-                    borderRadius: BorderRadius.circular(12),
+                child:
+                //Registration Logic Here
+                GestureDetector(
+                  onTap: () async {
+                    if (!validEmail(emailController.text)) {
+                      errorMessage = "Invalid email.";
+                    } else if (passwordController.text == "") {
+                      errorMessage = "Password is empty.";
+                    } else if (passwordCheckController.text !=
+                        passwordController.text) {
+                      errorMessage = "Both passwords do not match.";
+                    } else {
+                      //Run Email Authentication Here
+                      errorMessage = await auth.AuthHandler().register(
+                        emailController.text,
+                        passwordController.text,
+                      );
+                    }
+
+                    //Return Toast Notif
+                    if (errorMessage != "success") {
+                      Fluttertoast.showToast(
+                        msg: errorMessage,
+                        toastLength: Toast.LENGTH_LONG,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
+                    }
+                    else{
+                      //User Not On Other Pages
+                      if (context.mounted){
+                        Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context)=>UserInfoPage()));
+                      }
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Color(0xff002abc),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  child: Center(
-                    child: Text(
-                      'Sign up',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                    child: Center(
+                      child: Text(
+                        'Sign up',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
                       ),
+                    ),
                   ),
                 ),
               ),
@@ -127,16 +174,11 @@ class RegisterPage extends StatelessWidget {
 
               GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
+                  Navigator.pop(context);
                 },
                 child: Text(
                   'Already have an account',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  )
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -145,4 +187,10 @@ class RegisterPage extends StatelessWidget {
       ),
     );
   }
+}
+
+bool validEmail(emailInput) {
+  return RegExp(
+    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+  ).hasMatch(emailInput);
 }

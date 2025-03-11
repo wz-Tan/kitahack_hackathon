@@ -103,7 +103,7 @@ class LoginPage extends StatelessWidget {
                         errorMessage = "Password is Empty";
                       } else {
                         //Run Email Authentication Here
-                        errorMessage = await auth.AuthHandler().register(
+                        errorMessage = await auth.AuthHandler().signIn(
                           emailController.text,
                           passwordController.text,
                         );
@@ -121,7 +121,7 @@ class LoginPage extends StatelessWidget {
                           fontSize: 16.0,
                         );
                       } else {
-                        //Gather User Info
+                        //After Logged In Can Switch to Chapters
                       }
                     },
 
@@ -168,9 +168,10 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  bool validEmail(emailInput) {
+}
+
+bool validEmail(emailInput) {
     return RegExp(
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
     ).hasMatch(emailInput);
   }
-}
