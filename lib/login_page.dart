@@ -6,6 +6,10 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final emailController=TextEditingController();
+    final passwordController=TextEditingController();
+
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SafeArea(
@@ -37,6 +41,8 @@ class LoginPage extends StatelessWidget {
               //----------Email TextField----------//
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
+
+                //Email Container
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
@@ -46,6 +52,7 @@ class LoginPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: TextField(
+                      controller: emailController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Email',
@@ -59,15 +66,19 @@ class LoginPage extends StatelessWidget {
               //----------Password TextField----------//
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                //Password Container
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
                     border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
+                    //Password TextField
                     child: TextField(
+                      controller: passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -79,11 +90,29 @@ class LoginPage extends StatelessWidget {
               ),
               SizedBox(height: 50),
 
+
               //----------Button----------//
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
+
                 child: Container(
                   padding: EdgeInsets.all(12),
+
+                child: GestureDetector(
+                  onTap: (){
+                    if (!validEmail(emailController.text)){
+                      print("Invalid Email Format");
+                    }
+                    else if(passwordController.text!=""){
+                      print("Password Is Empty");
+                    }
+                    else{
+                      //Run Email Authentication Here
+                    }
+                  },
+                  child: Container(
+                  padding: EdgeInsets.all(20),
+
                   decoration: BoxDecoration(
                     color: Color(0xff002abc),
                     borderRadius: BorderRadius.circular(12),
@@ -99,6 +128,8 @@ class LoginPage extends StatelessWidget {
                       ),
                   ),
                 ),
+                )
+                
               ),
               SizedBox(height: 50),
 
@@ -123,4 +154,8 @@ class LoginPage extends StatelessWidget {
       ),
     );
   }
+}
+
+bool validEmail(emailInput){
+  return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(emailInput);
 }
