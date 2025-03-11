@@ -13,6 +13,9 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.1.2
+  firebase_auth: ^5.5.1
+  fluttertoast: ^8.2.12
+  
 
 dev_dependencies:
   flutter_test:

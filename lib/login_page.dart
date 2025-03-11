@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-
-    final emailController=TextEditingController();
-    final passwordController=TextEditingController();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    String errorMessage = "";
 
     return Scaffold(
       backgroundColor: Colors.grey[300],
@@ -18,10 +20,7 @@ class LoginPage extends StatelessWidget {
             children: [
               Text(
                 'kitaLearn',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 50),
 
@@ -58,7 +57,7 @@ class LoginPage extends StatelessWidget {
                     border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  
+
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     //Password TextField
@@ -78,36 +77,58 @@ class LoginPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: GestureDetector(
-                  onTap: (){
-                    if (!validEmail(emailController.text)){
-                      print("Invalid Email Format");
-                    }
-                    else if(passwordController.text!=""){
-                      print("Password Is Empty");
-                    }
-                    else{
+                  onTap: () async {
+
+                    if (!validEmail(emailController.text)) {
+                      errorMessage = "Invalid Email Format";
+                    } else if (passwordController.text == "") {
+                      errorMessage = "Password is Empty";
+                    } else {
                       //Run Email Authentication Here
+                       try {
+                        await FirebaseAuth.instance
+                            .createUserWithEmailAndPassword(
+                              email: emailController.text,
+                              password: passwordController.text,
+                            );
+                            errorMessage="";
+                      } on FirebaseAuthException catch (e) {
+                        errorMessage = e.code;
+                      }
+                    }
+
+                    //Return Toast Notif
+                    if (errorMessage != "") {
+                      Fluttertoast.showToast(
+                        msg: errorMessage,
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
                     }
                   },
+
                   child: Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurple,
-                    borderRadius: BorderRadius.circular(12),
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple,
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  child: Center(
-                    child: Text(
-                      'Sign In',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                    child: Center(
+                      child: Text(
+                        'Sign In',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
                         ),
                       ),
+                    ),
                   ),
                 ),
-                )
-                
               ),
               SizedBox(height: 10),
 
@@ -116,16 +137,14 @@ class LoginPage extends StatelessWidget {
                 children: [
                   Text(
                     'Not a member?',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Text(
                     ' Register Now',
                     style: TextStyle(
                       color: Colors.blue,
                       fontWeight: FontWeight.bold,
-                    )
+                    ),
                   ),
                 ],
               ),
@@ -137,6 +156,8 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-bool validEmail(emailInput){
-  return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(emailInput);
+bool validEmail(emailInput) {
+  return RegExp(
+    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+  ).hasMatch(emailInput);
 }
