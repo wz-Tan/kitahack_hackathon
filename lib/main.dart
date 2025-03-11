@@ -53,7 +53,6 @@ class MainAppState extends ChangeNotifier {
 
   void notifyLoggedIn(){
     loggedIn=true;
-
     notifyListeners();
   }
 
@@ -132,7 +131,7 @@ class _MainLayoutState extends State<MainLayout>{
   @override
   void initState() {
     super.initState();
-    Provider.of<MainAppState>(context,listen: true).initData();
+    // Provider.of<MainAppState>(context,listen: true).initData();
   }
 
   @override

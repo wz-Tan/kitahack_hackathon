@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kitahack_hackathon/register_page.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'auth.dart' as auth;
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
-
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  //0 for Sign In, 1 for Registration, 2 for Fill In Info
-  int currPage = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +19,6 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
               //----------Title----------//
               Text(
                 'kitaLearn',
@@ -39,10 +32,7 @@ class _LoginPageState extends State<LoginPage> {
 
               Text(
                 "Welcome back you've been missed!",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 50),
 
@@ -98,7 +88,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 50),
 
-
               //----------Button----------//
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
@@ -106,53 +95,51 @@ class _LoginPageState extends State<LoginPage> {
                 child: Container(
                   padding: EdgeInsets.all(12),
 
-                child: GestureDetector(
-                  onTap: () async {
-                    if (!validEmail(emailController.text)) {
-                      errorMessage = "Invalid Email Format";
-                    } else if (passwordController.text == "") {
-                      errorMessage = "Password is Empty";
-                    } else {
-                      //Run Email Authentication Here
-                      errorMessage = await auth.AuthHandler().register(
-                        emailController.text,
-                        passwordController.text,
-                      );
-                    }
+                  child: GestureDetector(
+                    onTap: () async {
+                      if (!validEmail(emailController.text)) {
+                        errorMessage = "Invalid Email Format";
+                      } else if (passwordController.text == "") {
+                        errorMessage = "Password is Empty";
+                      } else {
+                        //Run Email Authentication Here
+                        errorMessage = await auth.AuthHandler().register(
+                          emailController.text,
+                          passwordController.text,
+                        );
+                      }
 
-                    //Return Toast Notif
-                    if (errorMessage != "success") {
-                      Fluttertoast.showToast(
-                        msg: errorMessage,
-                        toastLength: Toast.LENGTH_LONG,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.red,
-                        textColor: Colors.white,
-                        fontSize: 16.0,
-                      );
-                    }
+                      //Return Toast Notif
+                      if (errorMessage != "success") {
+                        Fluttertoast.showToast(
+                          msg: errorMessage,
+                          toastLength: Toast.LENGTH_LONG,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.red,
+                          textColor: Colors.white,
+                          fontSize: 16.0,
+                        );
+                      } else {
+                        //Gather User Info
+                      }
+                    },
 
-                    else{
-                      //Gather User Info
-                      userInfoInputPage();
-                    }
-                  },
+                    child: Container(
+                      padding: EdgeInsets.all(20),
 
-                  child: Container(
-                  padding: EdgeInsets.all(20),
-
-                  decoration: BoxDecoration(
-                    color: Color(0xff002abc),
-                    borderRadius: BorderRadius.circular(12),
-                    ),
-                  child: Center(
-                    child: Text(
-                      'Sign in',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                      decoration: BoxDecoration(
+                        color: Color(0xff002abc),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Sign in',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),
@@ -171,9 +158,7 @@ class _LoginPageState extends State<LoginPage> {
                 },
                 child: Text(
                   'Create new account',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  )
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -182,10 +167,10 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-}
 
-bool validEmail(emailInput) {
-  return RegExp(
-    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-  ).hasMatch(emailInput);
+  bool validEmail(emailInput) {
+    return RegExp(
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    ).hasMatch(emailInput);
+  }
 }
