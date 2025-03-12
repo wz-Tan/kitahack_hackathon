@@ -28,6 +28,7 @@ flutter:
   uses-material-design: true
   assets:
     - .env
+    - assets/icons/Right-Arrow.png
 
   fonts:
     - family: Poppins
