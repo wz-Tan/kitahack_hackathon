@@ -9,12 +9,17 @@ import 'textstyles.dart' as textstyles;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
+
 import 'login_page.dart' as login_page;
-import 'backend.dart' as backend;
+import 'backend.dart' as custom_backend;
+
+
+dynamic backend;
 
 void main() async {
   //Init plugins
   WidgetsFlutterBinding.ensureInitialized();
+  backend=custom_backend.Backend();
 
   //Load Env File
   await dotenv.load(fileName: ".env");
@@ -83,7 +88,7 @@ class MainAppState extends ChangeNotifier {
           (QuerySnapshot query) {
             for (var doc in query.docs){
               chapterList.add(doc.id);
-            }
+          }
         }
       );
     
@@ -131,6 +136,7 @@ class _MainLayoutState extends State<MainLayout>{
   //Init db
   @override
   void initState() {
+    
     super.initState();
     // Provider.of<MainAppState>(context,listen: true).initData();
   }
@@ -140,7 +146,7 @@ class _MainLayoutState extends State<MainLayout>{
     var appState = context.watch<MainAppState>();
 
     if (appState.loggedIn==false){
-      backend.initGemini();
+      backend.generateContent();
       return login_page.LoginPage();
     }
     
