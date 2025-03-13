@@ -122,6 +122,7 @@ class LoginPage extends StatelessWidget {
                         );
                       } else {
                         //After Logged In Can Switch to Chapters
+                        print("Log In success!");
                       }
                     },
 

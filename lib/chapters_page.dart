@@ -16,7 +16,7 @@ class ChaptersPage extends StatelessWidget {
       return Text("Loading...");
     }
 
-    List<String> chapters = appState.chapterList;
+    List<String> chapters = ["Chapter 1, Chapter 2, Chapter 3"];
 
     //Padding, Sized Box then Column
     return SizedBox(
@@ -51,7 +51,7 @@ class ChapterSelectionBox extends StatelessWidget {
     var appState = context.watch<main.MainAppState>();
     return GestureDetector(
       onTap: () {
-        appState.changePage(0);
+        print("Show Lesson Page");
         appState.currChapter=chapterName;
       },
       child: Container(
