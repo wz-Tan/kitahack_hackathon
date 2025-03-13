@@ -1,9 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'firebase_options.dart';
 
-class AuthHandler{
+class AuthHandler{  
+
+  void createAuthListener() {
+    FirebaseAuth.instance.authStateChanges().listen(
+      (User? user){
+        if (user==null){
+          print("User is signed out!");
+        }
+        else{
+          print(user.uid);
+        }
+      }
+    );
+  }
 
   Future<String> register(email,password) async{
     try{
@@ -23,7 +33,7 @@ class AuthHandler{
   }
 
   Future<String> signIn(email,password) async{
-    
+
     try{
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email, 

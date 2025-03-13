@@ -1,6 +1,5 @@
 // ignore_for_file: non_constant_identifier_names
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,16 +26,14 @@ class Backend {
     initialised = true;
   }
 
-  void createUser(int userId, String name,int age, String location) async{
-    if (initialised==false) await init();
-    db.collection("Users").doc(userId.toString()).set({"name":name,"age":age,"location":location,"latest_set":0});
+  void createUser(String userId, String name,int age, String location) async{
+    db.collection("Users").doc(userId).set({"name":name,"age":age,"location":location,"latest_set":0});
   }
 
   //Get UID Then Return the Information
-  Future<dynamic> retrieveUserInfo(int userId) async{
-    if (initialised==false) await init();
+  Future<dynamic> retrieveUserInfo(String userId) async{
     dynamic userInfo;
-    await db.collection("Users").doc(userId.toString()).get().then(
+    await db.collection("Users").doc(userId).get().then(
       (docSnapshot){
         userInfo=docSnapshot.data();
       }
@@ -45,13 +42,12 @@ class Backend {
   }
 
   //Generate Questions Here (Need to Optimise the Generation)
-  void generateContent() async {
+  void generateQuestions(String userId) async {
     if (initialised == false) {
       await init();
     }
 
     //Retrieve User Information
-    var userId=6969;
     var userInfo = await retrieveUserInfo(userId);
     var userAge = userInfo["age"];
     var userLocation = userInfo["location"];
@@ -59,8 +55,8 @@ class Backend {
     latestSet++;
     
     //Update Latest Set
-    db.collection("Users").doc(userId.toString()).update({"latest_set":latestSet});
-    final setPath=db.collection("Users").doc(userId.toString()).collection("Set $latestSet");
+    db.collection("Users").doc(userId).update({"latest_set":latestSet});
+    final setPath=db.collection("Users").doc(userId).collection("Set $latestSet");
 
     final questionSchema = Schema.object(
       properties: {
@@ -126,7 +122,6 @@ class Backend {
     );
 
     
-    print(1);
     //Get List of Chapters
     var chapterListObject = await GenerativeModel(
       model: 'gemini-2.0-flash',
@@ -137,11 +132,10 @@ class Backend {
       ),
     ).generateContent([
       Content.text(
-        "Generate 12 math chapters for a $userAge year old in $userLocation based on the local syllabus, Keep the names as simple as possible while keeping a format such as Chapter 1: Multiplication",
+        "Generate specifically 12 math chapters for a $userAge year old in $userLocation based on the local syllabus, Keep the names as simple as possible while keeping a format such as Chapter 1: Multiplication",
       ),
     ]);
-    print(2);
-    print(chapterListObject);
+
 
     var chapterList=jsonDecode(chapterListObject.text!);
 

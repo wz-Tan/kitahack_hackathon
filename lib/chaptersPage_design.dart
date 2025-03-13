@@ -65,7 +65,7 @@ class bottomBorder extends StatelessWidget {
 class HoverRow extends StatefulWidget {
   final String text;
 
-  HoverRow({required this.text});
+  const HoverRow({required this.text, super.key});
 
   @override
   _HoverRowState createState() => _HoverRowState();
@@ -117,11 +117,14 @@ class _HoverRowState extends State<HoverRow> {
 
 //----------Multiple Chapters----------//
 class ChapterList extends StatelessWidget {
+  
   final List<String> chapters = List.generate(14, (index) => "Chapter ${index + 1}: ");
 
   final List<Widget> chapterPages = [
     // Chapter1Page(),
   ];
+
+  ChapterList({super.key});
 
   @override
   Widget build(BuildContext context) {
