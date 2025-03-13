@@ -1,4 +1,3 @@
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,21 +8,26 @@ import 'textstyles.dart' as textstyles;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
-
+import 'auth.dart' as custom_auth;
 import 'login_page.dart' as login_page;
 import 'backend.dart' as custom_backend;
 
 
 dynamic backend;
+dynamic auth;
 
 void main() async {
   //Init plugins
   WidgetsFlutterBinding.ensureInitialized();
+
   backend=custom_backend.Backend();
+  auth=custom_auth.AuthHandler();
+  await backend.init();
+  auth.createAuthListener(); 
 
   //Load Env File
   await dotenv.load(fileName: ".env");
-
+  
 
   //Init Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -133,20 +137,11 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout>{
 
-  //Init db
-  @override
-  void initState() {
-    
-    super.initState();
-    // Provider.of<MainAppState>(context,listen: true).initData();
-  }
-
   @override
   Widget build(BuildContext context){
     var appState = context.watch<MainAppState>();
 
     if (appState.loggedIn==false){
-      backend.generateContent();
       return login_page.LoginPage();
     }
     

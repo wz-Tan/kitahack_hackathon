@@ -31,7 +31,7 @@ class LoginPage extends StatelessWidget {
               SizedBox(height: 10),
 
               Text(
-                "Welcome back you've been missed!",
+                "Welcome back!",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 50),
