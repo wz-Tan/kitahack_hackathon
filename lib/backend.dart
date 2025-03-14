@@ -7,12 +7,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'dart:convert';
 
-//Used For: Gemini Generation, Firestore Retrieval and Update
 class Backend {
+
   late String google_api_key;
   late String gemini_api_key;
   late dynamic db;
-  bool initialised = false;
+  late dynamic setPath;
+
+  late String userId;
+  late dynamic userInfo;
 
   //Initialise Environments (Gemini and Firebase) -> Run this first before anything
   Future<void> init() async {
@@ -23,32 +26,36 @@ class Backend {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     db=FirebaseFirestore.instance;
-    initialised = true;
   }
 
-  void createUser(String userId, String name,int age, String location) async{
+  void createUser(String name,int age, String location) async{
     db.collection("Users").doc(userId).set({"name":name,"age":age,"location":location,"latest_set":0});
   }
 
-  //Get UID Then Return the Information
-  Future<dynamic> retrieveUserInfo(String userId) async{
-    dynamic userInfo;
+  //Use UID to Set Info (User ID is present, but method not picking up anything)->No content yet?
+  Future<void> retrieveUserInfo() async{
     await db.collection("Users").doc(userId).get().then(
       (docSnapshot){
         userInfo=docSnapshot.data();
       }
     );
-    return userInfo;
+    setPath=db.collection("Users").doc(userId).collection("Set ${userInfo["latest_set"]}");
   }
 
+  //Get All The Chapters Here->Need to Set setPath->
+  void retrieveChapters() async {
+    if (userInfo==null) await retrieveUserInfo();
+
+  }
+
+
+
   //Generate Questions Here (Need to Optimise the Generation)
-  void generateQuestions(String userId) async {
-    if (initialised == false) {
-      await init();
-    }
+  void generateQuestions() async {
+    //Check if Initialised Yet-How? 
+    if (!userInfo) await retrieveUserInfo();
 
     //Retrieve User Information
-    var userInfo = await retrieveUserInfo(userId);
     var userAge = userInfo["age"];
     var userLocation = userInfo["location"];
     var latestSet=userInfo["latest_set"];

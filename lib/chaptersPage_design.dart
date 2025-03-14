@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:kitahack_hackathon/colours.dart';
 // import 'package:kitalearn/pages/chapter_1.dart';
 
 class ChapterPage extends StatelessWidget {
-  const ChapterPage({super.key});
+  const ChapterPage({super.key, required this.backend});
+
+  final dynamic backend;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +71,7 @@ class HoverRow extends StatefulWidget {
   const HoverRow({required this.text, super.key});
 
   @override
-  _HoverRowState createState() => _HoverRowState();
+  createState() => _HoverRowState();
 }
 
 class _HoverRowState extends State<HoverRow> {
@@ -102,11 +105,10 @@ class _HoverRowState extends State<HoverRow> {
                 widget.text,
                 style: TextStyle(color: _textColor),
               ),
-              Image.asset(
-                "assets/icons/Right-Arrow.png",
-                width: 14,
-                height: 14,
-              ),
+              Icon(
+                Icons.arrow_forward_ios_outlined,
+                color: black,
+              )
             ],
           ),
         ),
@@ -117,7 +119,8 @@ class _HoverRowState extends State<HoverRow> {
 
 //----------Multiple Chapters----------//
 class ChapterList extends StatelessWidget {
-  
+
+  //Feed Chapters Here
   final List<String> chapters = List.generate(14, (index) => "Chapter ${index + 1}: ");
 
   final List<Widget> chapterPages = [
