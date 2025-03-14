@@ -1,19 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
-class AuthHandler{  
 
-  void createAuthListener() {
-    FirebaseAuth.instance.authStateChanges().listen(
-      (User? user){
-        if (user==null){
-          print("User is signed out!");
-        }
-        else{
-          print(user.uid);
-        }
-      }
-    );
-  }
+class AuthHandler{  
 
   Future<String> register(email,password) async{
     try{
