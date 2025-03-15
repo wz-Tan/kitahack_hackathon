@@ -13,8 +13,7 @@ class QuestionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //Take In Question List From Main
-    var questionList =
-        context.watch<main.MainAppState>().chapterList;
+    var questionList =["1,2,3"];
 
     return Container(
       color: Color(0xFFFFFFFF),

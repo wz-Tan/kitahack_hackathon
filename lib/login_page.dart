@@ -120,10 +120,8 @@ class LoginPage extends StatelessWidget {
                           textColor: Colors.white,
                           fontSize: 16.0,
                         );
-                      } else {
-                        //After Logged In Can Switch to Chapters
-                        print("Log In success!");
                       }
+                
                     },
 
                     child: Container(
