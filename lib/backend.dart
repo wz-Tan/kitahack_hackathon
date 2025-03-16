@@ -12,10 +12,9 @@ class Backend {
   late String gemini_api_key;
   late dynamic db;
   late dynamic setPath;
-
-  //How to Check if Initialised 
   late String userId;
   late dynamic userInfo;
+  bool userInfoRetrieved=false;
 
  
   Future<void> init() async {
@@ -28,7 +27,7 @@ class Backend {
     db = FirebaseFirestore.instance;
   }
 
-  void createUser(String name, int age, String location) async {
+  void createUser(String name, String age, String location) async {
     db.collection("Users").doc(userId).set({
       "name": name,
       "age": age,
@@ -36,6 +35,7 @@ class Backend {
       "latest_set": 0,
     });
   }
+
 
   //Use UID to Set Info (User ID is present, but method not picking up anything)->No content yet?
   Future<void> retrieveUserInfo() async {
@@ -46,10 +46,12 @@ class Backend {
         .collection("Users")
         .doc(userId)
         .collection("Set ${userInfo["latest_set"]}");
+    userInfoRetrieved=true;
   }
 
   Future<List<String>> retrieveChapters() async {
-    if (userInfo == null) await retrieveUserInfo();
+    if (!userInfoRetrieved) await retrieveUserInfo();
+    print("USer Info is, $userInfo");
     List<String> chapterList = [];
     await setPath.get().then((QuerySnapshot query) {
       for (var doc in query.docs) {
@@ -61,14 +63,13 @@ class Backend {
       int numB = int.parse(b.split(" ")[1].replaceAll(":", ""));
       return numA.compareTo(numB);
     });
-    print(chapterList);
     return chapterList;
   }
 
   //Generate Questions Here (Need to Optimise the Generation)
   void generateQuestions() async {
     //Check if Initialised Yet-How?
-    if (!userInfo) await retrieveUserInfo();
+    if (!userInfoRetrieved) await retrieveUserInfo();
 
     //Retrieve User Information
     var userAge = userInfo["age"];

@@ -15,21 +15,21 @@ class AuthHandler{
     }
   }
 
-  //Register, Then Retrieve User Info and Associate the values 
-  void createUser(){
-    
-  }
-
   Future<String> signIn(email,password) async{
 
     try{
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email, 
         password: password);
+        print("Sign In Success");
         return "success";
     }
     on FirebaseAuthException catch(e){
       return e.code;
     }
+  }
+
+  Future <void> signOut() async{
+    await FirebaseAuth.instance.signOut();
   }
 }
