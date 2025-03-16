@@ -1,15 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'chapters_page.dart' as chapters_page;
-import 'lesson_questions_page.dart' as lesson_question_selection_page;
+import 'chapter_page.dart' as chapter_page;
 import 'colours.dart' as colours;
 import 'textstyles.dart' as textstyles;
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'firebase_options.dart';
-import 'chaptersPage_design.dart' as chapter_page;
 import 'auth.dart' as custom_auth;
 import 'login_page.dart' as login_page;
 import 'backend.dart' as custom_backend;
@@ -39,50 +36,7 @@ class EnvProvider {
 
 //Global App State
 class MainAppState extends ChangeNotifier {
-  late String userId;
-
-  //Initialise the firebase client
-  final db = FirebaseFirestore.instance;
-
-  late int latestSet;
-  dynamic setPath;
-  late List<String> chapterList = ["Chapter 1, Chapter 2, Chapter 3"];
-  late String currChapter="Current Chapter";
-  bool isLoading = true;
-
-  //Get data from firestore
-  Future initData() async {
-    dynamic userInfo;
-
-    //Acquire User Info
-    await db.collection("Users").doc(userId).get().then((
-      DocumentSnapshot doc,
-    ) {
-      userInfo = doc.data();
-    });
-
-    latestSet = userInfo["latest_set"];
-
-    //Get Set Path to Run Faster
-    setPath = db.collection("Users").doc(userId).collection("Set $latestSet");
-
-    //Get Chapter ID  (Create Chapter Card For Each)
-    await setPath.get().then((QuerySnapshot query) {
-      for (var doc in query.docs) {
-        chapterList.add(doc.id);
-      }
-    });
-
-    //Sort based on chapter number  (Split between spaces then retrieve the 2nd index, which is the number)
-    chapterList.sort((a, b) {
-      int numA = int.parse(a.split(" ")[1].replaceAll(":", ""));
-      int numB = int.parse(b.split(" ")[1].replaceAll(":", ""));
-      return numA.compareTo(numB);
-    });
-
-    isLoading = false;
-    notifyListeners();
-  }
+  
 }
 
 //Main App, Prepares State and Prompts Main Layout
@@ -125,7 +79,7 @@ class _MainLayoutState extends State<MainLayout> {
         if (userLoggedIn==false){
           setState(() {
           backend.userId=user.uid;
-          backend.generateQuestions();
+          backend.retrieveUserInfo();
           userLoggedIn = true;
         });
         }
@@ -138,7 +92,20 @@ class _MainLayoutState extends State<MainLayout> {
       return login_page.LoginPage();
     }
     else{
-      return chapter_page.ChapterPage(backend: backend);
+      return FutureBuilder(
+        future: backend.retrieveChapters(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData){
+            print(snapshot.data);
+             return chapter_page.ChapterPage(backend: backend, chapterList: []);
+          }
+          if (snapshot.hasError){
+            print(snapshot.error);
+          }
+          return Text("loading");
+        },
+      );
+     
     }
   }
 }

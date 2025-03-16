@@ -3,12 +3,13 @@ import 'package:kitahack_hackathon/colours.dart';
 // import 'package:kitalearn/pages/chapter_1.dart';
 
 class ChapterPage extends StatelessWidget {
-  const ChapterPage({super.key, required this.backend});
-
+  const ChapterPage({super.key, required this.backend, required this.chapterList});
   final dynamic backend;
+  final List<String> chapterList;
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SafeArea(
