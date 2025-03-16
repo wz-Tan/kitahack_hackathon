@@ -15,7 +15,7 @@ class Backend {
 
   //How to Check if Initialised 
   late String userId;
-  late dynamic userInfo;
+  dynamic userInfo;
 
  
   Future<void> init() async {
@@ -37,6 +37,22 @@ class Backend {
     });
   }
 
+  Future<String> locatonExists(String location) async{
+    var response = await GenerativeModel(
+      model: 'gemini-2.0-flash',
+      apiKey: gemini_api_key,
+      generationConfig: GenerationConfig(
+        responseMimeType: 'application/json',
+        responseSchema: Schema.string()),
+      )
+    .generateContent([
+      Content.text(
+        "Does this $location exist? If yes, return the word `yes`, if not return the word `no`. Answer in full lowercase."
+      ),
+    ]);
+    return jsonDecode(response.text!).toString();
+  }
+
   //Use UID to Set Info (User ID is present, but method not picking up anything)->No content yet?
   Future<void> retrieveUserInfo() async {
     await db.collection("Users").doc(userId).get().then((docSnapshot) {
@@ -50,6 +66,7 @@ class Backend {
 
   Future<List<String>> retrieveChapters() async {
     if (userInfo == null) await retrieveUserInfo();
+    print("USer Info is, $userInfo");
     List<String> chapterList = [];
     await setPath.get().then((QuerySnapshot query) {
       for (var doc in query.docs) {
@@ -61,7 +78,6 @@ class Backend {
       int numB = int.parse(b.split(" ")[1].replaceAll(":", ""));
       return numA.compareTo(numB);
     });
-    print(chapterList);
     return chapterList;
   }
 

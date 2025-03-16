@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'auth.dart' as auth;
-import 'user_info_page.dart';
+import 'userinfo_page.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -141,14 +141,6 @@ class RegisterPage extends StatelessWidget {
                         textColor: Colors.white,
                         fontSize: 16.0,
                       );
-                    }
-                    else{
-                      //User Not On Other Pages
-                      if (context.mounted){
-                        Navigator.push(
-                        context, 
-                        MaterialPageRoute(builder: (context)=>UserInfoPage()));
-                      }
                     }
                   },
                   child: Container(

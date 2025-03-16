@@ -15,11 +15,6 @@ class AuthHandler{
     }
   }
 
-  //Register, Then Retrieve User Info and Associate the values 
-  void createUser(){
-    
-  }
-
   Future<String> signIn(email,password) async{
 
     try{
@@ -31,5 +26,9 @@ class AuthHandler{
     on FirebaseAuthException catch(e){
       return e.code;
     }
+  }
+
+  Future <void> signOut() async{
+    await FirebaseAuth.instance.signOut();
   }
 }

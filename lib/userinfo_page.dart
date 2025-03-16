@@ -3,11 +3,17 @@ import 'package:flutter/services.dart';
 
 RegExp numericRegex = RegExp(r'^[0-9]+$');
 
-class InfoPage extends StatelessWidget {
-  const InfoPage({super.key});
+class UserInfoPage extends StatelessWidget {
+  const UserInfoPage({super.key, required this.backend});
+  final dynamic backend;
 
   @override
   Widget build(BuildContext context) {
+    final nameController = TextEditingController();
+    final ageController = TextEditingController();
+    final locationController = TextEditingController();
+    String errorMessage = "";
+
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SafeArea(
@@ -15,10 +21,9 @@ class InfoPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
               //----------Title----------//
               Text(
-                'Info',
+                'Enter Your Information',
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
@@ -27,7 +32,7 @@ class InfoPage extends StatelessWidget {
               ),
               SizedBox(height: 50),
 
-              //----------Email TextField----------//
+              //----------Name TextField----------//
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: Container(
@@ -39,6 +44,7 @@ class InfoPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: TextField(
+                      controller: nameController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Name',
@@ -49,7 +55,7 @@ class InfoPage extends StatelessWidget {
               ),
               SizedBox(height: 20),
 
-              //----------Password TextField----------//
+              //----------Age TextField----------//
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: Container(
@@ -61,7 +67,10 @@ class InfoPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: TextField(
-                      inputFormatters: [FilteringTextInputFormatter.allow(numericRegex)],
+                      controller: ageController,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(numericRegex),
+                      ],
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Age',
@@ -72,6 +81,7 @@ class InfoPage extends StatelessWidget {
               ),
               SizedBox(height: 20),
 
+              //Location TextField
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: Container(
@@ -83,6 +93,7 @@ class InfoPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: TextField(
+                      controller: locationController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Location',
@@ -94,21 +105,26 @@ class InfoPage extends StatelessWidget {
               SizedBox(height: 50),
 
               //----------Button----------//
+              //Create User Account
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: GestureDetector(
-                  onTap: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => ChapterPage()),
-                    // );
+                  onTap: () async {
+                    print("All information here");
+                    errorMessage=await infoCheck(
+                      backend,
+                      nameController.text,
+                      ageController.text,
+                      locationController.text,
+                    );
+                    print(errorMessage);
                   },
                   child: Container(
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Color(0xff002abc),
                       borderRadius: BorderRadius.circular(12),
-                      ),
+                    ),
                     child: Center(
                       child: Text(
                         'Continue',
@@ -116,8 +132,8 @@ class InfoPage extends StatelessWidget {
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          ),
                         ),
+                      ),
                     ),
                   ),
                 ),
@@ -129,4 +145,24 @@ class InfoPage extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<String> infoCheck(dynamic backend, String name, String age, String location) async {
+  var response=await backend.locationExists("Malaysia");
+  print(response);
+  int ageVal = int.parse(age);
+  if ((age == "" || location == "") || name == "") {
+    return "Please Fill in All Fields.";
+  }
+  try {
+    if (ageVal >= 100) {
+      return "Please Ensure Your Age is Correct.";
+    }
+    if (backend.locationExists(location) == "no") {
+      return "This location is not valid";
+    }
+  } catch (e) {
+    return e.toString();
+  }
+  return "";
 }

@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'auth.dart' as custom_auth;
 import 'login_page.dart' as login_page;
 import 'backend.dart' as custom_backend;
+import 'userinfo_page.dart' as userinfo_page;
 
 dynamic backend;
 dynamic auth;
@@ -70,7 +71,7 @@ class _MainLayoutState extends State<MainLayout> {
       if (user == null) {
         if (userLoggedIn==true){
           setState(() {
-          backend.userId=null;
+          backend.userId="";
           userLoggedIn = false;
         });
         }
@@ -79,7 +80,6 @@ class _MainLayoutState extends State<MainLayout> {
         if (userLoggedIn==false){
           setState(() {
           backend.userId=user.uid;
-          backend.retrieveUserInfo();
           userLoggedIn = true;
         });
         }
@@ -102,7 +102,7 @@ class _MainLayoutState extends State<MainLayout> {
           if (snapshot.hasError){
             print(snapshot.error);
           }
-          return Text("loading");
+          return userinfo_page.UserInfoPage(backend: backend,);
         },
       );
      
