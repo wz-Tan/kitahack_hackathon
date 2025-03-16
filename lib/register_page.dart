@@ -142,6 +142,12 @@ class RegisterPage extends StatelessWidget {
                         fontSize: 16.0,
                       );
                     }
+                    else{
+                      if (context.mounted){
+                        //Return to enter info page
+                        Navigator.pop(context);
+                      }
+                    }
                   },
                   child: Container(
                     padding: EdgeInsets.all(12),

@@ -17,6 +17,7 @@ dependencies:
   fluttertoast: ^8.2.12
   flutter_gemini: ^3.0.0
   google_generative_ai: ^0.4.6
+  country_list: ^0.0.5
   
 
 dev_dependencies:

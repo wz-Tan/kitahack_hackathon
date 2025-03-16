@@ -12,10 +12,9 @@ class Backend {
   late String gemini_api_key;
   late dynamic db;
   late dynamic setPath;
-
-  //How to Check if Initialised 
   late String userId;
-  dynamic userInfo;
+  late dynamic userInfo;
+  bool userInfoRetrieved=false;
 
  
   Future<void> init() async {
@@ -28,7 +27,7 @@ class Backend {
     db = FirebaseFirestore.instance;
   }
 
-  void createUser(String name, int age, String location) async {
+  void createUser(String name, String age, String location) async {
     db.collection("Users").doc(userId).set({
       "name": name,
       "age": age,
@@ -37,21 +36,6 @@ class Backend {
     });
   }
 
-  Future<String> locatonExists(String location) async{
-    var response = await GenerativeModel(
-      model: 'gemini-2.0-flash',
-      apiKey: gemini_api_key,
-      generationConfig: GenerationConfig(
-        responseMimeType: 'application/json',
-        responseSchema: Schema.string()),
-      )
-    .generateContent([
-      Content.text(
-        "Does this $location exist? If yes, return the word `yes`, if not return the word `no`. Answer in full lowercase."
-      ),
-    ]);
-    return jsonDecode(response.text!).toString();
-  }
 
   //Use UID to Set Info (User ID is present, but method not picking up anything)->No content yet?
   Future<void> retrieveUserInfo() async {
@@ -62,10 +46,11 @@ class Backend {
         .collection("Users")
         .doc(userId)
         .collection("Set ${userInfo["latest_set"]}");
+    userInfoRetrieved=true;
   }
 
   Future<List<String>> retrieveChapters() async {
-    if (userInfo == null) await retrieveUserInfo();
+    if (!userInfoRetrieved) await retrieveUserInfo();
     print("USer Info is, $userInfo");
     List<String> chapterList = [];
     await setPath.get().then((QuerySnapshot query) {
@@ -84,7 +69,7 @@ class Backend {
   //Generate Questions Here (Need to Optimise the Generation)
   void generateQuestions() async {
     //Check if Initialised Yet-How?
-    if (!userInfo) await retrieveUserInfo();
+    if (!userInfoRetrieved) await retrieveUserInfo();
 
     //Retrieve User Information
     var userAge = userInfo["age"];

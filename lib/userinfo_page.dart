@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:country_list/country_list.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 RegExp numericRegex = RegExp(r'^[0-9]+$');
 
@@ -96,7 +98,7 @@ class UserInfoPage extends StatelessWidget {
                       controller: locationController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'Location',
+                        hintText: 'Country',
                       ),
                     ),
                   ),
@@ -110,14 +112,25 @@ class UserInfoPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: GestureDetector(
                   onTap: () async {
-                    print("All information here");
                     errorMessage=await infoCheck(
                       backend,
                       nameController.text,
                       ageController.text,
                       locationController.text,
                     );
-                    print(errorMessage);
+
+                    if(errorMessage!=""){
+                        Fluttertoast.showToast(
+                          msg: errorMessage,
+                          toastLength: Toast.LENGTH_LONG,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.red,
+                          textColor: Colors.white,
+                          fontSize: 16.0,
+                        );
+                    }
+                    
                   },
                   child: Container(
                     padding: EdgeInsets.all(12),
@@ -147,22 +160,26 @@ class UserInfoPage extends StatelessWidget {
   }
 }
 
-Future<String> infoCheck(dynamic backend, String name, String age, String location) async {
-  var response=await backend.locationExists("Malaysia");
-  print(response);
+Future<String> infoCheck(dynamic backend, String name, String age, String countryInput) async {
+  String countryName=" $countryInput";
+  List<String> countryList=[];
+  for (var country in Countries.list){
+    countryList.add(country.name.toLowerCase().trim());
+  }
+
   int ageVal = int.parse(age);
-  if ((age == "" || location == "") || name == "") {
+  if ((age == "" || countryName == "") || name == "") {
     return "Please Fill in All Fields.";
   }
-  try {
-    if (ageVal >= 100) {
-      return "Please Ensure Your Age is Correct.";
-    }
-    if (backend.locationExists(location) == "no") {
-      return "This location is not valid";
-    }
-  } catch (e) {
-    return e.toString();
+  if (ageVal >= 100) {
+    return "Please Ensure Your Age is Correct.";
   }
+  if (countryList.contains(countryName.toLowerCase())){
+    return "Please Insert A Valid Country"; 
+  }
+  else{
+    await backend.createUser(name,age,countryName);
+  }
+
   return "";
 }

@@ -78,9 +78,10 @@ class _MainLayoutState extends State<MainLayout> {
       } else {
         //User Signed In 
         if (userLoggedIn==false){
-          setState(() {
           backend.userId=user.uid;
+          setState(() {
           userLoggedIn = true;
+          print("User has signed in");
         });
         }
         
@@ -96,13 +97,9 @@ class _MainLayoutState extends State<MainLayout> {
         future: backend.retrieveChapters(),
         builder: (context, snapshot) {
           if (snapshot.hasData){
-            print(snapshot.data);
              return chapter_page.ChapterPage(backend: backend, chapterList: []);
           }
-          if (snapshot.hasError){
-            print(snapshot.error);
-          }
-          return userinfo_page.UserInfoPage(backend: backend,);
+          return userinfo_page.UserInfoPage(backend: backend);
         },
       );
      

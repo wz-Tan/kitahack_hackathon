@@ -21,6 +21,7 @@ class AuthHandler{
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email, 
         password: password);
+        print("Sign In Success");
         return "success";
     }
     on FirebaseAuthException catch(e){
