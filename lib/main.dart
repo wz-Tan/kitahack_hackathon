@@ -63,6 +63,7 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   bool userLoggedIn=false;
+  bool userExists=false;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +82,7 @@ class _MainLayoutState extends State<MainLayout> {
           backend.userId=user.uid;
           setState(() {
           userLoggedIn = true;
-          print("User has signed in");
+          userExists=backend.userExists();
         });
         }
         
@@ -89,9 +90,16 @@ class _MainLayoutState extends State<MainLayout> {
     }
     );
 
+    //Ensure Logged In
     if (userLoggedIn == false) {
       return login_page.LoginPage();
     }
+    //Ensure Data is Present
+    else if (userExists==false){
+      return userinfo_page.UserInfoPage(backend: backend,);
+    }
+
+    //Show Chapters
     else{
       return FutureBuilder(
         future: backend.retrieveChapters(),
@@ -99,7 +107,7 @@ class _MainLayoutState extends State<MainLayout> {
           if (snapshot.hasData){
              return chapter_page.ChapterPage(backend: backend, chapterList: []);
           }
-          return userinfo_page.UserInfoPage(backend: backend);
+          return Text("Retrieving Chapters In this Set");
         },
       );
      

@@ -27,6 +27,19 @@ class Backend {
     db = FirebaseFirestore.instance;
   }
 
+  //Used To Check Whether User Has Already Init in DB
+  Future<bool> userExists() async{
+    dynamic response=false;
+    await db.collection("Users").doc(userId).get().then(
+      (snapshot){
+        if (snapshot.data()==null){
+          response=true;
+        }
+      }
+    );
+    return response;
+  }
+
   void createUser(String name, String age, String location) async {
     db.collection("Users").doc(userId).set({
       "name": name,
@@ -51,7 +64,6 @@ class Backend {
 
   Future<List<String>> retrieveChapters() async {
     if (!userInfoRetrieved) await retrieveUserInfo();
-    print("USer Info is, $userInfo");
     List<String> chapterList = [];
     await setPath.get().then((QuerySnapshot query) {
       for (var doc in query.docs) {
