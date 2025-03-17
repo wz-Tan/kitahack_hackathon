@@ -6,8 +6,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 RegExp numericRegex = RegExp(r'^[0-9]+$');
 
 class UserInfoPage extends StatelessWidget {
-  const UserInfoPage({super.key, required this.backend});
+  const UserInfoPage({super.key, required this.backend, required this.userExistsUpdate});
   final dynamic backend;
+  final Function userExistsUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +130,11 @@ class UserInfoPage extends StatelessWidget {
                           textColor: Colors.white,
                           fontSize: 16.0,
                         );
+                    }
+                    else{
+                      //Notify That User Does Exist, then pop the page 
+                      userExistsUpdate();
+                      print("User now exists in db");
                     }
                     
                   },

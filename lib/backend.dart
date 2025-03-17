@@ -27,12 +27,11 @@ class Backend {
     db = FirebaseFirestore.instance;
   }
 
-  //Used To Check Whether User Has Already Init in DB
   Future<bool> userExists() async{
     dynamic response=false;
     await db.collection("Users").doc(userId).get().then(
       (snapshot){
-        if (snapshot.data()==null){
+        if (snapshot.data()!=null){
           response=true;
         }
       }
