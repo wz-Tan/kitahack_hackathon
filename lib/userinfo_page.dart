@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:country_list/country_list.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'loading_page.dart';
 
 RegExp numericRegex = RegExp(r'^[0-9]+$');
 
 class UserInfoPage extends StatelessWidget {
-  const UserInfoPage({super.key, required this.backend});
+  const UserInfoPage({super.key, required this.backend, required this.userExistsUpdate});
   final dynamic backend;
+  final Function userExistsUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +131,14 @@ class UserInfoPage extends StatelessWidget {
                           textColor: Colors.white,
                           fontSize: 16.0,
                         );
+                    }
+
+                    //Successful User Creation
+                    else{
+                      if (context.mounted){
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoadingPage(backend:backend)));
+                      }
+                      
                     }
                     
                   },

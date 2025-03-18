@@ -36,9 +36,7 @@ class EnvProvider {
 }
 
 //Global App State
-class MainAppState extends ChangeNotifier {
-  
-}
+class MainAppState extends ChangeNotifier {}
 
 //Main App, Prepares State and Prompts Main Layout
 class MainApp extends StatelessWidget {
@@ -62,47 +60,71 @@ class MainLayout extends StatefulWidget {
 }
 
 class _MainLayoutState extends State<MainLayout> {
-  bool userLoggedIn=false;
+  bool userLoggedIn = false;
+  bool userExists = false;
+
+  void userExistsUpdate() {
+    setState(() {
+      userExists = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    //Auth Listener
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      //User Logs Out
       if (user == null) {
-        if (userLoggedIn==true){
+        if (userLoggedIn == true) {
           setState(() {
-          backend.userId="";
-          userLoggedIn = false;
-        });
+            backend.userId = "";
+            userLoggedIn = false;
+          });
         }
       } else {
-        //User Signed In 
-        if (userLoggedIn==false){
-          backend.userId=user.uid;
+        if (userLoggedIn == false) {
+          backend.userId = user.uid;
           setState(() {
-          userLoggedIn = true;
-          print("User has signed in");
-        });
+            userLoggedIn = true;
+          });
         }
-        
       }
-    }
-    );
+    });
 
+    //Ensure Logged In
     if (userLoggedIn == false) {
       return login_page.LoginPage();
     }
-    else{
+
+    //User Exists Check (Called In User Info Page ->Learn to Redraw Upon user Creation with keys)
+    if (userExists == false) {
+      return FutureBuilder(
+        future: backend.userExists(),
+        builder: (context, snapshot) {
+          if (snapshot.data == false) {
+            return userinfo_page.UserInfoPage(
+              backend: backend,
+              userExistsUpdate: userExistsUpdate,
+            );
+          }
+          if (snapshot.data == true) {
+            userExistsUpdate();
+            return Text("User does exist. So show chapter page.");
+          }
+          return Text("Retrieving User Info");
+        },
+      );
+    }
+    //Show Chapters
+    else {
       return FutureBuilder(
         future: backend.retrieveChapters(),
         builder: (context, snapshot) {
-          if (snapshot.hasData){
-             return chapter_page.ChapterPage(backend: backend, chapterList: []);
+          if (snapshot.hasData) {
+            return chapter_page.ChapterPage(backend: backend, chapterList: []);
           }
-          return userinfo_page.UserInfoPage(backend: backend);
+          return Text("Retrieving Chapters In this Set");
         },
       );
-     
     }
   }
 }

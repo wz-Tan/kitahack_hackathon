@@ -49,8 +49,8 @@ class ChapterPage extends StatelessWidget {
 }
 
 //----------Divider----------//
-class bottomBorder extends StatelessWidget {
-  const bottomBorder({
+class BottomBorder extends StatelessWidget {
+  const BottomBorder({
     super.key,
   });
 
@@ -151,7 +151,7 @@ class ChapterList extends StatelessWidget {
               },
               child: HoverRow(text: chapter)
             ),
-            if (index != chapters.length - 1) bottomBorder(),
+            if (index != chapters.length - 1) BottomBorder(),
           ],
         );
       })

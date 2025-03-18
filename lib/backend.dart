@@ -14,9 +14,8 @@ class Backend {
   late dynamic setPath;
   late String userId;
   late dynamic userInfo;
-  bool userInfoRetrieved=false;
+  bool userInfoRetrieved = false;
 
- 
   Future<void> init() async {
     await dotenv.load(fileName: ".env");
     google_api_key = dotenv.env["google_api_key"].toString();
@@ -25,6 +24,16 @@ class Backend {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     db = FirebaseFirestore.instance;
+  }
+
+  Future<bool> userExists() async {
+    dynamic response = false;
+    await db.collection("Users").doc(userId).get().then((snapshot) {
+      if (snapshot.data() != null) {
+        response = true;
+      }
+    });
+    return response;
   }
 
   void createUser(String name, String age, String location) async {
@@ -36,8 +45,6 @@ class Backend {
     });
   }
 
-
-  //Use UID to Set Info (User ID is present, but method not picking up anything)->No content yet?
   Future<void> retrieveUserInfo() async {
     await db.collection("Users").doc(userId).get().then((docSnapshot) {
       userInfo = docSnapshot.data();
@@ -46,12 +53,11 @@ class Backend {
         .collection("Users")
         .doc(userId)
         .collection("Set ${userInfo["latest_set"]}");
-    userInfoRetrieved=true;
+    userInfoRetrieved = true;
   }
 
   Future<List<String>> retrieveChapters() async {
     if (!userInfoRetrieved) await retrieveUserInfo();
-    print("USer Info is, $userInfo");
     List<String> chapterList = [];
     await setPath.get().then((QuerySnapshot query) {
       for (var doc in query.docs) {
@@ -66,9 +72,7 @@ class Backend {
     return chapterList;
   }
 
-  //Generate Questions Here (Need to Optimise the Generation)
-  void generateQuestions() async {
-    //Check if Initialised Yet-How?
+  Future<void> generateQuestions() async {
     if (!userInfoRetrieved) await retrieveUserInfo();
 
     //Retrieve User Information
@@ -157,39 +161,45 @@ class Backend {
       ),
     ).generateContent([
       Content.text(
-        "Generate specifically 12 math chapters for a $userAge year old in $userLocation based on the local syllabus, Keep the names as simple as possible while keeping a format such as Chapter 1: Multiplication",
+        "Generate up to 12 math chapters for a $userAge year old in $userLocation based on the local syllabus, Keep the names as simple as possible while keeping a format such as Chapter 1: Multiplication",
       ),
     ]);
 
-    var chapterList = jsonDecode(chapterListObject.text!);
+    List<dynamic> chapterList = jsonDecode(chapterListObject.text!);
 
-    //Generate List of Lessons for Each Chapter
-    for (String chapter in chapterList) {
-      var lessonListObject = await GenerativeModel(
-        model: 'gemini-2.0-flash',
-        apiKey: gemini_api_key,
-        generationConfig: GenerationConfig(
-          responseMimeType: 'application/json',
-          responseSchema: Schema.array(items: lessonSchema),
-        ),
-      ).generateContent([
-        Content.text(
-          "According to the chapter name, provide a list of lessons. For each lesson, provide 3 suitable practice questions as well. Each question should be provided with the working for the solution of the question. Provide 4 choices for each answer, one has to contain the actual answer. At the sam Provide concrete examples and comprehensive elaborations. Humanise your reply as if you are an actual teacher. This is aimed to help a $userAge year old in $userLocation to understand the local syllabus. The chapter name is $chapter",
-        ),
-      ]);
-      var lessonList = jsonDecode(lessonListObject.text!);
+    //Generate List of Lessons for Each Chapter (Wait for Everything to Run due to Map)
+    Future.wait(
+      chapterList.map((chapter) async {
+        var lessonListObject = await GenerativeModel(
+          model: 'gemini-2.0-flash',
+          apiKey: gemini_api_key,
+          generationConfig: GenerationConfig(
+            responseMimeType: 'application/json',
+            responseSchema: Schema.array(items: lessonSchema),
+          ),
+        ).generateContent([
+          Content.text(
+            "According to the chapter name, provide a list of lessons. For each lesson, provide 3 suitable practice questions as well. Each question should be provided with the working for the solution of the question. Provide 4 choices for each answer, one has to contain the actual answer. At the sam Provide concrete examples and comprehensive elaborations. Humanise your reply as if you are an actual teacher. This is aimed to help a $userAge year old in $userLocation to understand the local syllabus. The chapter name is $chapter",
+          ),
+        ]);
+        List<dynamic> lessonList = jsonDecode(lessonListObject.text!);
 
-      //Create the Doc to Hold the Lessons
-      setPath.doc(chapter).set({"completed": false});
+        //Create the Doc to Hold the Lessons
+        setPath.doc(chapter).set({"completed": false});
 
-      //Insert Lessons Into Lesson Folder
-      for (var lesson in lessonList) {
-        setPath
-            .doc(chapter)
-            .collection("Lessons")
-            .doc(lesson["lessonName"])
-            .set(lesson);
-      }
-    }
+        //Insert Lessons Into Lesson Folder
+        await Future.wait(
+          lessonList.map((lesson) =>
+            setPath
+                .doc(chapter)
+                .collection("Lessons")
+                .doc(lesson["lessonName"])
+                .set(lesson)
+          ),
+        );
+      }),
+    );
+
+    return;
   }
 }
