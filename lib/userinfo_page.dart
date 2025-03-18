@@ -7,9 +7,9 @@ import 'loading_page.dart';
 RegExp numericRegex = RegExp(r'^[0-9]+$');
 
 class UserInfoPage extends StatelessWidget {
-  const UserInfoPage({super.key, required this.backend, required this.userExistsUpdate});
+  const UserInfoPage({super.key, required this.backend, required this.redrawPage});
   final dynamic backend;
-  final Function userExistsUpdate;
+  final Function redrawPage;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class UserInfoPage extends StatelessWidget {
             children: [
               //----------Title----------//
               Text(
-                'Enter Your Information',
+                'What Should We Know About You?',
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
@@ -136,7 +136,7 @@ class UserInfoPage extends StatelessWidget {
                     //Successful User Creation
                     else{
                       if (context.mounted){
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoadingPage(backend:backend)));
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoadingPage(backend:backend, redrawPage:redrawPage)));
                       }
                       
                     }

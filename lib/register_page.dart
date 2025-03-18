@@ -123,7 +123,6 @@ class RegisterPage extends StatelessWidget {
                         passwordController.text) {
                       errorMessage = "Both passwords do not match.";
                     } else {
-                      //Run Email Authentication Here
                       errorMessage = await auth.AuthHandler().register(
                         emailController.text,
                         passwordController.text,
@@ -144,7 +143,6 @@ class RegisterPage extends StatelessWidget {
                     }
                     else{
                       if (context.mounted){
-                        //Return to enter info page
                         Navigator.pop(context);
                       }
                     }

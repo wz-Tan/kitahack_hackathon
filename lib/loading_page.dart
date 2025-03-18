@@ -1,11 +1,11 @@
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'textstyles.dart';
 
 class LoadingPage extends StatelessWidget{
-  const LoadingPage({super.key, required this.backend});
+  const LoadingPage({super.key, required this.backend, required this.redrawPage});
   final dynamic backend;
+  final Function redrawPage;
 
   @override 
   Widget build(BuildContext context) {
@@ -16,8 +16,8 @@ class LoadingPage extends StatelessWidget{
         if (snapshot.connectionState == ConnectionState.done) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (context.mounted) {
+              redrawPage();
               Navigator.pop(context);
-              //Can Redraw the Page here
             }
           });
         }
@@ -27,6 +27,7 @@ class LoadingPage extends StatelessWidget{
           child: Center(
             child: Column(
               children: [
+                SizedBox(height: 30,),
                 Text("Generating Chapters... This Could Take A While.",style: defaultText,),
                 CircularProgressIndicator(backgroundColor: Colors.grey,)
               ],

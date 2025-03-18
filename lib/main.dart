@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'textstyles.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -61,11 +61,9 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   bool userLoggedIn = false;
-  bool userExists = false;
 
-  void userExistsUpdate() {
+  void redrawPage(){
     setState(() {
-      userExists = true;
     });
   }
 
@@ -95,36 +93,35 @@ class _MainLayoutState extends State<MainLayout> {
       return login_page.LoginPage();
     }
 
-    //User Exists Check (Called In User Info Page ->Learn to Redraw Upon user Creation with keys)
-    if (userExists == false) {
-      return FutureBuilder(
-        future: backend.userExists(),
-        builder: (context, snapshot) {
-          if (snapshot.data == false) {
-            return userinfo_page.UserInfoPage(
-              backend: backend,
-              userExistsUpdate: userExistsUpdate,
-            );
-          }
-          if (snapshot.data == true) {
-            userExistsUpdate();
-            return Text("User does exist. So show chapter page.");
-          }
-          return Text("Retrieving User Info");
-        },
-      );
-    }
-    //Show Chapters
-    else {
-      return FutureBuilder(
-        future: backend.retrieveChapters(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return chapter_page.ChapterPage(backend: backend, chapterList: []);
-          }
-          return Text("Retrieving Chapters In this Set");
-        },
-      );
-    }
+    //User Exists Check (Show Create Page/Chapters Page)
+    return FutureBuilder(
+      future: backend.userExists(),
+      builder: (context, snapshot) {
+        if (snapshot.data == false) {
+          return userinfo_page.UserInfoPage(
+            backend: backend,
+            redrawPage: redrawPage,
+          );
+        }
+        if (snapshot.data == true) {
+          return chapter_page.ChapterPage(backend: backend);
+        }
+
+        return SizedBox(
+          width: double.infinity,
+          height: double.infinity,
+          child: Center(
+            child: Column(
+              children: [
+                SizedBox(height: 30,),
+                Text("Retrieving Chapters... This Could Take A While.",style: defaultText,),
+                CircularProgressIndicator(backgroundColor: Colors.grey,)
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  
   }
 }
