@@ -78,7 +78,7 @@ class Backend {
   }
 
   //Generate Questions Here (Need to Optimise the Generation)
-  void generateQuestions() async {
+  Future<void> generateQuestions() async {
     //Check if Initialised Yet-How?
     if (!userInfoRetrieved) await retrieveUserInfo();
 
@@ -202,5 +202,7 @@ class Backend {
             .set(lesson);
       }
     }
+
+    return;
   }
 }

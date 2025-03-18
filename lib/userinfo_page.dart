@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:country_list/country_list.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'loading_page.dart';
 
 RegExp numericRegex = RegExp(r'^[0-9]+$');
 
@@ -131,10 +132,13 @@ class UserInfoPage extends StatelessWidget {
                           fontSize: 16.0,
                         );
                     }
+
+                    //Successful User Creation
                     else{
-                      //Notify That User Does Exist, then pop the page 
-                      userExistsUpdate();
-                      print("User now exists in db");
+                      if (context.mounted){
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoadingPage(backend:backend)));
+                      }
+                      
                     }
                     
                   },

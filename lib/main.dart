@@ -95,7 +95,7 @@ class _MainLayoutState extends State<MainLayout> {
       return login_page.LoginPage();
     }
 
-    //Ensure User Exists (Stateful Var to Decide Page Shown)
+    //User Exists Check (Called In User Info Page ->Learn to Redraw Upon user Creation with keys)
     if (userExists == false) {
       return FutureBuilder(
         future: backend.userExists(),
@@ -107,6 +107,7 @@ class _MainLayoutState extends State<MainLayout> {
             );
           }
           if (snapshot.data == true) {
+            userExistsUpdate();
             return Text("User does exist. So show chapter page.");
           }
           return Text("Retrieving User Info");
