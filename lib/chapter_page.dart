@@ -3,9 +3,8 @@ import 'package:kitahack_hackathon/colours.dart';
 // import 'package:kitalearn/pages/chapter_1.dart';
 
 class ChapterPage extends StatelessWidget {
-  const ChapterPage({super.key, required this.backend, required this.chapterList});
+  const ChapterPage({super.key, required this.backend});
   final dynamic backend;
-  final List<String> chapterList;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +23,7 @@ class ChapterPage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top:  25, bottom: 16),
                   child: Text(
-                    'Choose the chapter',
+                    'Choose A Chapter to Learn!',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
