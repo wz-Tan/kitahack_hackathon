@@ -27,7 +27,7 @@ class LoadingPage extends StatelessWidget{
           child: Center(
             child: Column(
               children: [
-                SizedBox(height: 30,),
+                SizedBox(height: 80,),
                 Text("Generating Chapters... This Could Take A While.",style: defaultText,),
                 CircularProgressIndicator(backgroundColor: Colors.grey,)
               ],
