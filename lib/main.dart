@@ -113,8 +113,9 @@ class _MainLayoutState extends State<MainLayout> {
           child: Center(
             child: Column(
               children: [
-                SizedBox(height: 80,),
+                SizedBox(height: 80),
                 Text("Retrieving User Info...",style: defaultText,),
+                SizedBox(height: 80),
                 CircularProgressIndicator(backgroundColor: Colors.grey,)
               ],
             ),

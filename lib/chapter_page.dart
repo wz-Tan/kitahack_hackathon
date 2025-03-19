@@ -11,82 +11,74 @@ class ChapterPage extends StatelessWidget {
     List<String> chapterNames;
 
     return FutureBuilder(
-      future:backend.retrieveChapters(),
-      builder: (context, snapshot){
-        if (snapshot.hasData){
-          chapterNames=snapshot.data as List<String>;
-          return Text(chapterNames.first);
-        }
+      future: backend.retrieveChapters(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          chapterNames = snapshot.data as List<String>;
+          return Scaffold(
+            backgroundColor: Colors.grey[300],
+            body: SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      //----------Title----------//
+                      Padding(
+                        padding: const EdgeInsets.only(top: 25, bottom: 16),
+                        child: Text(
+                          'Choose A Chapter to Learn!',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
 
-        else{
-          return SizedBox(
-          width: double.infinity,
-          height: double.infinity,
-          child: Center(
-            child: Column(
-              children: [
-                SizedBox(height: 80,),
-                Text("Retrieving Chapters",style: defaultText,),
-                CircularProgressIndicator(backgroundColor: Colors.grey,)
-              ],
-            ),
-          ),
-        );
-        }
-      }
-    );
-    
-    return Scaffold(
-      backgroundColor: Colors.grey[300],
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-            
-                //----------Title----------//
-                Padding(
-                  padding: const EdgeInsets.only(top:  25, bottom: 16),
-                  child: Text(
-                    'Choose A Chapter to Learn!',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                      //----------Chapters---------//
+                      Column(
+                        children: [
+                          ChapterList(chapters: chapterNames),
+                          SizedBox(height: 16),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-            
-                //----------Chapters---------//
-                Column(
-                  children: [
-                    ChapterList(),
-                    SizedBox(height: 16),
-                  ],
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
+          );
+        } else {
+          return SizedBox(
+            width: double.infinity,
+            height: double.infinity,
+            child: Center(
+              child: Column(
+                children: [
+                  SizedBox(height: 80),
+                  Text("Retrieving Chapters", style: defaultText),
+                  SizedBox(height: 80),
+                  CircularProgressIndicator(backgroundColor: Colors.grey),
+                ],
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 }
 
 //----------Divider----------//
 class BottomBorder extends StatelessWidget {
-  const BottomBorder({
-    super.key,
-  });
+  const BottomBorder({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25.0),
-      child: Divider(
-        color: Colors.grey,
-      ),
+      child: Divider(color: Colors.grey),
     );
   }
 }
@@ -110,14 +102,16 @@ class _HoverRowState extends State<HoverRow> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: MouseRegion(
-        onEnter: (_) => setState(() {
-          _backgroundColor = Color(0xff002abc);
-          _textColor = Colors.white;
-          }),
-        onExit: (_) => setState(() {
-          _backgroundColor = Colors.transparent;
-          _textColor = Colors.black;
-          }),
+        onEnter:
+            (_) => setState(() {
+              _backgroundColor = Color(0xff002abc);
+              _textColor = Colors.white;
+            }),
+        onExit:
+            (_) => setState(() {
+              _backgroundColor = Colors.transparent;
+              _textColor = Colors.black;
+            }),
         child: AnimatedContainer(
           duration: Duration(milliseconds: 200),
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 16),
@@ -128,14 +122,8 @@ class _HoverRowState extends State<HoverRow> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                widget.text,
-                style: TextStyle(color: _textColor),
-              ),
-              Icon(
-                Icons.arrow_forward_ios_outlined,
-                color: black,
-              )
+              Text(widget.text, style: TextStyle(color: _textColor)),
+              Icon(Icons.arrow_forward_ios_outlined, color: black),
             ],
           ),
         ),
@@ -146,42 +134,40 @@ class _HoverRowState extends State<HoverRow> {
 
 //----------Multiple Chapters----------//
 class ChapterList extends StatelessWidget {
-
   //Feed Chapters Here
-  final List<String> chapters = List.generate(14, (index) => "Chapter ${index + 1}: ");
+  final List<String> chapters;
 
   final List<Widget> chapterPages = [
     // Chapter1Page(),
   ];
 
-  ChapterList({super.key});
+  ChapterList({super.key, required this.chapters});
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: chapters
-      .asMap()
-      .entries
-      .map((entry) {
-        int index = entry.key;
-        String chapter = entry.value;
+      children:
+          chapters.asMap().entries.map((entry) {
+            int index = entry.key;
+            String chapter = entry.value;
 
-        return Column(
-          children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => chapterPages[index]),
-                );
-              },
-              child: HoverRow(text: chapter)
-            ),
-            if (index != chapters.length - 1) BottomBorder(),
-          ],
-        );
-      })
-      .toList(),
+            return Column(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => chapterPages[index],
+                      ),
+                    );
+                  },
+                  child: HoverRow(text: chapter),
+                ),
+                if (index != chapters.length - 1) BottomBorder(),
+              ],
+            );
+          }).toList(),
     );
   }
 }
