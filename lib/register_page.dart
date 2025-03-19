@@ -128,8 +128,7 @@ class RegisterPage extends StatelessWidget {
                         passwordController.text,
                       );
                     }
-
-                    //Return Toast Notif
+                    
                     if (errorMessage != "success") {
                       Fluttertoast.showToast(
                         msg: errorMessage,

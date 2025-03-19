@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kitahack_hackathon/colours.dart';
-// import 'package:kitalearn/pages/chapter_1.dart';
+import 'textstyles.dart';
 
 class ChapterPage extends StatelessWidget {
   const ChapterPage({super.key, required this.backend});
@@ -8,6 +8,33 @@ class ChapterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<String> chapterNames;
+
+    return FutureBuilder(
+      future:backend.retrieveChapters(),
+      builder: (context, snapshot){
+        if (snapshot.hasData){
+          chapterNames=snapshot.data as List<String>;
+          return Text(chapterNames.first);
+        }
+
+        else{
+          return SizedBox(
+          width: double.infinity,
+          height: double.infinity,
+          child: Center(
+            child: Column(
+              children: [
+                SizedBox(height: 80,),
+                Text("Retrieving Chapters",style: defaultText,),
+                CircularProgressIndicator(backgroundColor: Colors.grey,)
+              ],
+            ),
+          ),
+        );
+        }
+      }
+    );
     
     return Scaffold(
       backgroundColor: Colors.grey[300],
