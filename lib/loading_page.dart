@@ -13,7 +13,7 @@ class LoadingPage extends StatelessWidget{
       future: backend.generateQuestions(), 
       builder: (context,snapshot){
         //Pop after finished drawing and confirmed generation
-        if (snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.hasData) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (context.mounted) {
               redrawPage();

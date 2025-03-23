@@ -93,7 +93,7 @@ class _MainLayoutState extends State<MainLayout> {
       return login_page.LoginPage();
     }
 
-    //User Exists Check (Show Create Page/Chapters Page)
+    
     return FutureBuilder(
       future: backend.userExists(),
       builder: (context, snapshot) {

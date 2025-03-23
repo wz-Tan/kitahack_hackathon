@@ -64,6 +64,7 @@ class Backend {
         chapterList.add(doc.id);
       }
     });
+    
     chapterList.sort((a, b) {
       int numA = int.parse(a.split(" ")[1].replaceAll(":", ""));
       int numB = int.parse(b.split(" ")[1].replaceAll(":", ""));
@@ -72,7 +73,7 @@ class Backend {
     return chapterList;
   }
 
-  Future<void> generateQuestions() async {
+  Future<int> generateQuestions() async {
     if (!userInfoRetrieved) await retrieveUserInfo();
 
     //Retrieve User Information
@@ -83,7 +84,7 @@ class Backend {
 
     //Update Latest Set
     db.collection("Users").doc(userId).update({"latest_set": latestSet});
-    final setPath = db
+    final generateQuestionsPath = db
         .collection("Users")
         .doc(userId)
         .collection("Set $latestSet");
@@ -168,7 +169,7 @@ class Backend {
     List<dynamic> chapterList = jsonDecode(chapterListObject.text!);
 
     //Generate List of Lessons for Each Chapter (Wait for Everything to Run due to Map)
-    Future.wait(
+    await Future.wait(
       chapterList.map((chapter) async {
         var lessonListObject = await GenerativeModel(
           model: 'gemini-2.0-flash',
@@ -185,12 +186,12 @@ class Backend {
         List<dynamic> lessonList = jsonDecode(lessonListObject.text!);
 
         //Create the Doc to Hold the Lessons
-        setPath.doc(chapter).set({"completed": false});
+        generateQuestionsPath.doc(chapter).set({"completed": false});
 
         //Insert Lessons Into Lesson Folder
         await Future.wait(
           lessonList.map((lesson) =>
-            setPath
+            generateQuestionsPath
                 .doc(chapter)
                 .collection("Lessons")
                 .doc(lesson["lessonName"])
@@ -199,7 +200,8 @@ class Backend {
         );
       }),
     );
-
-    return;
+    //Reset for fetching
+    userInfoRetrieved=false;
+    return 1;
   }
 }
