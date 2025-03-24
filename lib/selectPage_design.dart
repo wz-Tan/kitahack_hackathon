@@ -1,7 +1,10 @@
+// ignore_for_file: file_names
+import 'lessons_page.dart';
 import 'package:flutter/material.dart';
 
 class SelectPage extends StatelessWidget {
-  const SelectPage({super.key});
+  const SelectPage({super.key, required this.backend});
+  final dynamic backend;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +18,7 @@ class SelectPage extends StatelessWidget {
 
               //----------Title----------//
               Text(
-                'TITLEEEEEE',
+                "What's for today? ",
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
@@ -30,7 +33,16 @@ class SelectPage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Container(
+                    GestureDetector(
+                      onTap: ()=>{
+                        Navigator.push(
+                          context,
+                      MaterialPageRoute(
+                        builder: (context) => LessonsPage(backend: backend,)
+                      ),
+                    )
+                      },
+                      child: Container(
                       height: MediaQuery.of(context).size.height * 0.2,
                       width: MediaQuery.of(context).size.width * 0.5,
                       decoration: BoxDecoration(
@@ -48,6 +60,8 @@ class SelectPage extends StatelessWidget {
                           ),
                       ),
                     ),
+                    ),
+                    
                     
                     Container(
                       height: MediaQuery.of(context).size.height * 0.2,

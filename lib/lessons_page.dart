@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:kitahack_hackathon/colours.dart';
-import 'package:kitahack_hackathon/main.dart';
+import 'package:kitahack_hackathon/questionPage_design.dart';
 import 'package:kitahack_hackathon/selectPage_design.dart';
 import 'textstyles.dart';
 
-class ChapterPage extends StatelessWidget {
-  const ChapterPage({super.key, required this.backend});
+class LessonsPage extends StatelessWidget {
+  const LessonsPage({super.key, required this.backend});
   final dynamic backend;
 
   @override
   Widget build(BuildContext context) {
-    List<String> chapterNames;
+    List<String> lessonNames;
 
     return FutureBuilder(
-      future: backend.retrieveChapters(),
+      future: backend.retrieveLessons(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          chapterNames = snapshot.data as List<String>;
+          lessonNames = snapshot.data as List<String>;
           return Scaffold(
             backgroundColor: Colors.grey[300],
             body: SafeArea(
@@ -24,13 +24,13 @@ class ChapterPage extends StatelessWidget {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       //----------Title----------//
                       Padding(
                         padding: const EdgeInsets.only(top: 25, bottom: 16),
                         child: Text(
-                          'Choose A Chapter to Learn!',
+                          'Choose A Lesson',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -41,7 +41,7 @@ class ChapterPage extends StatelessWidget {
                       //----------Chapters---------//
                       Column(
                         children: [
-                          ChapterList(chapters: chapterNames),
+                          LessonList(lessons: lessonNames, backend:backend),
                           SizedBox(height: 16),
                         ],
                       ),
@@ -58,10 +58,10 @@ class ChapterPage extends StatelessWidget {
             child: Center(
               child: Column(
                 children: [
-                  SizedBox(height: 80),
-                  Text("Retrieving Chapters", style: defaultText),
-                  SizedBox(height: 80),
-                  CircularProgressIndicator(backgroundColor: Colors.grey),
+                  Center(
+                    child: CircularProgressIndicator(backgroundColor: Colors.grey),
+                  )
+                  ,
                 ],
               ),
             ),
@@ -135,34 +135,37 @@ class _HoverRowState extends State<HoverRow> {
 }
 
 //----------Multiple Chapters----------//
-class ChapterList extends StatelessWidget {
-  final List<String> chapters;
+class LessonList extends StatelessWidget {
+  
+  final dynamic backend;
+  final List<String> lessons;
 
-  const ChapterList({super.key, required this.chapters});
+  const LessonList({super.key, required this.lessons, required this.backend});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children:
-          chapters.asMap().entries.map((entry) {
+          lessons.asMap().entries.map((entry) {
             int index = entry.key;
-            String chapter = entry.value;
+            String lesson = entry.value;
 
             return Column(
               children: [
                 GestureDetector(
                   onTap: () {
-                    backend.currChapter=chapter;
+                    backend.currLesson=lesson;
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SelectPage(backend: backend)
+                        builder: (context) => QuestionPage(backend: backend)
                       ),
                     );
                   },
-                  child: HoverRow(text: chapter),
+                  child: HoverRow(text: lesson),
                 ),
-                if (index != chapters.length - 1) BottomBorder(),
+                if (index != lessons.length - 1) BottomBorder(),
               ],
             );
           }).toList(),

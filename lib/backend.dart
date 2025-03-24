@@ -14,6 +14,8 @@ class Backend {
   late dynamic setPath;
   late String userId;
   late dynamic userInfo;
+  late String currChapter;
+  late String currLesson;
   bool userInfoRetrieved = false;
 
   Future<void> init() async {
@@ -71,6 +73,26 @@ class Backend {
       return numA.compareTo(numB);
     });
     return chapterList;
+  }
+
+  Future<List<String>> retrieveLessons() async {
+    List<String> lessonList = [];
+    await setPath.doc(currChapter).collection("Lessons").get().then((QuerySnapshot query) {
+      for (var doc in query.docs) {
+        lessonList.add(doc.id);
+      }
+    });
+    
+    return lessonList;
+  }
+
+  Future<dynamic> retrieveLesson() async {
+    dynamic response;
+    await setPath.doc(currChapter).collection("Lessons").doc(currLesson).get().then((snapshot) {
+      response=snapshot.data();
+    });
+    print(response);
+    return response;
   }
 
   Future<int> generateQuestions() async {
@@ -169,7 +191,7 @@ class Backend {
     List<dynamic> chapterList = jsonDecode(chapterListObject.text!);
 
     //Generate List of Lessons for Each Chapter (Wait for Everything to Run due to Map)
-    await Future.wait(
+    Future.wait(
       chapterList.map((chapter) async {
         var lessonListObject = await GenerativeModel(
           model: 'gemini-2.0-flash',
