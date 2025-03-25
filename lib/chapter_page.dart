@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kitahack_hackathon/colours.dart';
 import 'package:kitahack_hackathon/main.dart';
-import 'package:kitahack_hackathon/selectPage_design.dart';
 import 'textstyles.dart';
+import "lessons_page.dart";
 
 class ChapterPage extends StatelessWidget {
   const ChapterPage({super.key, required this.backend});
@@ -156,7 +156,7 @@ class ChapterList extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SelectPage(backend: backend)
+                        builder: (context) => LessonsPage(backend: backend,)
                       ),
                     );
                   },

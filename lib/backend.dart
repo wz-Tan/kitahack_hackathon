@@ -91,7 +91,6 @@ class Backend {
     await setPath.doc(currChapter).collection("Lessons").doc(currLesson).get().then((snapshot) {
       response=snapshot.data();
     });
-    print(response);
     return response;
   }
 

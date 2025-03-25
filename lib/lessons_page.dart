@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kitahack_hackathon/colours.dart';
 import 'package:kitahack_hackathon/questionPage_design.dart';
-import 'package:kitahack_hackathon/selectPage_design.dart';
 import 'textstyles.dart';
 
 class LessonsPage extends StatelessWidget {
