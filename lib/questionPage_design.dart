@@ -48,7 +48,16 @@ class _QuestionPageState extends State<QuestionPage> {
                       children: [
                         Positioned(
                           left: 10,
-                          child: Icon(Icons.arrow_back_outlined),
+                          bottom: 5,
+                          child: GestureDetector(
+                            onTap: () {
+                              if (context.mounted){
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: Icon(Icons.home),
+                          )
+
                         ),
                         Center(
                           child: Text(
@@ -70,9 +79,41 @@ class _QuestionPageState extends State<QuestionPage> {
             body: Container(
               width: double.maxFinite,
               height: double.maxFinite,
-              padding: EdgeInsets.fromLTRB(20, 5, 20, 10),
+              padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
               child: Column(
                 children: [
+                  SizedBox(
+                    width: double.infinity,
+                    height: 30,
+                    child: Stack(
+                      children: [
+                        if (currQuestion!=0)
+                        Positioned(
+                        left: 0,
+                        top: 0,
+                        child: GestureDetector(
+                          onTap:()=> setState(() {
+                            currQuestion--;
+                          }),
+                          child:Icon(Icons.arrow_back_ios_sharp),
+                        
+                      ),
+                        ),
+                      if (currQuestion!=2)
+                        Positioned(
+                        right: 0,
+                        top: 0,
+                        child: GestureDetector(
+                          onTap:()=> setState(() {
+                            currQuestion++;
+                          }),
+                          child:Icon(Icons.arrow_forward_ios_sharp), 
+                        )
+                         
+                        )
+                      ] 
+                    ),
+                  ),
                   Text(
                     "What Is It?",
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),

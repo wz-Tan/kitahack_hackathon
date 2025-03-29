@@ -52,15 +52,15 @@ class ChapterPage extends StatelessWidget {
             ),
           );
         } else {
-          return SizedBox(
+          return Container(
             width: double.infinity,
             height: double.infinity,
+            color: Colors.white,
             child: Center(
               child: Column(
                 children: [
                   SizedBox(height: 80),
-                  Text("Retrieving Chapters", style: defaultText),
-                  SizedBox(height: 80),
+                  Text("Retrieving User Info", style: defaultText),
                   CircularProgressIndicator(backgroundColor: Colors.grey),
                 ],
               ),
@@ -124,7 +124,10 @@ class _HoverRowState extends State<HoverRow> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(widget.text, style: TextStyle(color: _textColor, fontSize: 18)),
+              Text(
+                widget.text,
+                style: TextStyle(color: _textColor, fontSize: 18),
+              ),
               Icon(Icons.arrow_forward_ios_outlined, color: black),
             ],
           ),
@@ -152,11 +155,11 @@ class ChapterList extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap: () {
-                    backend.currChapter=chapter;
+                    backend.currChapter = chapter;
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => LessonsPage(backend: backend,)
+                        builder: (context) => LessonsPage(backend: backend),
                       ),
                     );
                   },
