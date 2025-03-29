@@ -18,7 +18,7 @@ class ChapterPage extends StatelessWidget {
         if (snapshot.hasData) {
           chapterNames = snapshot.data as List<String>;
           return Scaffold(
-            backgroundColor: Colors.grey[300],
+            backgroundColor: Colors.white,
             body: SafeArea(
               child: Center(
                 child: SingleChildScrollView(
@@ -30,9 +30,9 @@ class ChapterPage extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(top: 25, bottom: 16),
                         child: Text(
-                          'Choose A Chapter to Learn!',
+                          'Select A Chapter',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -124,7 +124,7 @@ class _HoverRowState extends State<HoverRow> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(widget.text, style: TextStyle(color: _textColor)),
+              Text(widget.text, style: TextStyle(color: _textColor, fontSize: 18)),
               Icon(Icons.arrow_forward_ios_outlined, color: black),
             ],
           ),

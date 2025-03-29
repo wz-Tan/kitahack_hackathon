@@ -17,9 +17,8 @@ class LessonsPage extends StatelessWidget {
         if (snapshot.hasData) {
           lessonNames = snapshot.data as List<String>;
           return Scaffold(
-            backgroundColor: Colors.grey[300],
+            backgroundColor: Colors.white,
             body: SafeArea(
-              child: Center(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Column(
@@ -31,7 +30,7 @@ class LessonsPage extends StatelessWidget {
                         child: Text(
                           'Choose A Lesson',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -46,7 +45,6 @@ class LessonsPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
               ),
             ),
           );
@@ -123,7 +121,7 @@ class _HoverRowState extends State<HoverRow> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(widget.text, style: TextStyle(color: _textColor)),
+              Text(widget.text, style: TextStyle(color: _textColor, fontSize: 18)),
               Icon(Icons.arrow_forward_ios_outlined, color: black),
             ],
           ),

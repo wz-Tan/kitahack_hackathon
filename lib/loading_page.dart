@@ -21,14 +21,17 @@ class LoadingPage extends StatelessWidget{
             }
           });
         }
-        return SizedBox(
+        return Container(
           width: double.infinity,
           height: double.infinity,
+          color: Colors.white,
           child: Center(
             child: Column(
               children: [
                 SizedBox(height: 80,),
-                Text("Generating Chapters... This Could Take A While.",style: defaultText,),
+                Center(
+                  child:Text("Generating Chapters... This Could Take A While.",style: defaultText,),
+                ),
                 CircularProgressIndicator(backgroundColor: Colors.grey,)
               ],
             ),
