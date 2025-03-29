@@ -93,7 +93,7 @@ class _MainLayoutState extends State<MainLayout> {
       return login_page.LoginPage();
     }
 
-    //User Exists Check (Show Create Page/Chapters Page)
+    
     return FutureBuilder(
       future: backend.userExists(),
       builder: (context, snapshot) {
@@ -107,15 +107,15 @@ class _MainLayoutState extends State<MainLayout> {
           return chapter_page.ChapterPage(backend: backend);
         }
 
-        return SizedBox(
+        return Container(
           width: double.infinity,
           height: double.infinity,
+          color: Colors.white,
           child: Center(
             child: Column(
               children: [
-                SizedBox(height: 80),
-                Text("Retrieving User Info...",style: defaultText,),
-                SizedBox(height: 80),
+                SizedBox(height: 80,),
+                Text("Retrieving User Info",style: defaultText,),
                 CircularProgressIndicator(backgroundColor: Colors.grey,)
               ],
             ),

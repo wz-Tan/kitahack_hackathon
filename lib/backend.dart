@@ -14,6 +14,8 @@ class Backend {
   late dynamic setPath;
   late String userId;
   late dynamic userInfo;
+  late String currChapter;
+  late String currLesson;
   bool userInfoRetrieved = false;
 
   Future<void> init() async {
@@ -64,6 +66,7 @@ class Backend {
         chapterList.add(doc.id);
       }
     });
+    
     chapterList.sort((a, b) {
       int numA = int.parse(a.split(" ")[1].replaceAll(":", ""));
       int numB = int.parse(b.split(" ")[1].replaceAll(":", ""));
@@ -72,7 +75,26 @@ class Backend {
     return chapterList;
   }
 
-  Future<void> generateQuestions() async {
+  Future<List<String>> retrieveLessons() async {
+    List<String> lessonList = [];
+    await setPath.doc(currChapter).collection("Lessons").get().then((QuerySnapshot query) {
+      for (var doc in query.docs) {
+        lessonList.add(doc.id);
+      }
+    });
+    
+    return lessonList;
+  }
+
+  Future<dynamic> retrieveLesson() async {
+    dynamic response;
+    await setPath.doc(currChapter).collection("Lessons").doc(currLesson).get().then((snapshot) {
+      response=snapshot.data();
+    });
+    return response;
+  }
+
+  Future<int> generateQuestions() async {
     if (!userInfoRetrieved) await retrieveUserInfo();
 
     //Retrieve User Information
@@ -83,37 +105,34 @@ class Backend {
 
     //Update Latest Set
     db.collection("Users").doc(userId).update({"latest_set": latestSet});
-    final setPath = db
+    final generateQuestionsPath = db
         .collection("Users")
         .doc(userId)
         .collection("Set $latestSet");
 
-    final questionSchema = Schema.object(
+
+    final topicSchema=Schema.object(
       properties: {
-        "description": Schema.string(
-          description: "Description for a Math Question",
+        "topic": Schema.string(
           nullable: false,
         ),
-        "answer": Schema.string(
-          description: "Answer For the Math Question",
+        "explanation": Schema.string(
+          description:
+              "Brief explanation on the topic",
           nullable: false,
         ),
-        "working": Schema.string(
-          description: "Working for the Math Question",
+        "example": Schema.string(
+          description: "Based off topic and explanation, provide a simple example of the topic",
           nullable: false,
-        ),
-        "completed": Schema.boolean(nullable: false),
-        //Adding In A List Of Choices
-        "choices": Schema.array(
-          items: Schema.string(
-            description: "Possible Answer for the question",
-            nullable: false,
-          ),
         ),
       },
-      requiredProperties: ["answer", "working", "description", "choices"],
+      requiredProperties: [
+        "topic",
+        "explanation",
+        "example"
+      ],
+      nullable: false
     );
-
     final lessonSchema = Schema.object(
       description: "Schema for a Lesson",
       properties: {
@@ -121,32 +140,16 @@ class Backend {
           description: "Name of the Lesson. Should be short and concise",
           nullable: false,
         ),
-        "description": Schema.string(
-          description:
-              "Teach about the lesson as if you are a human teacher. Be detailed but concise.",
-          nullable: false,
-        ),
-        "example": Schema.string(
-          description: "Provide an example for the lesson.",
-          nullable: false,
-        ),
-        "explanation": Schema.string(
-          description:
-              "Based on the example, provide the working and elaboration.",
-          nullable: false,
-        ),
 
-        "questions": Schema.array(
-          description: "3 Questions for the Lesson ",
-          items: questionSchema,
-        ),
+        "topicList":Schema.array(
+          items: topicSchema,
+          nullable: false,
+        )
+
       },
       requiredProperties: [
         "lessonName",
-        "description",
-        "example",
-        "explanation",
-        "questions",
+        "topicList"
       ],
       nullable: false,
     );
@@ -168,7 +171,7 @@ class Backend {
     List<dynamic> chapterList = jsonDecode(chapterListObject.text!);
 
     //Generate List of Lessons for Each Chapter (Wait for Everything to Run due to Map)
-    Future.wait(
+    await Future.wait(
       chapterList.map((chapter) async {
         var lessonListObject = await GenerativeModel(
           model: 'gemini-2.0-flash',
@@ -179,18 +182,18 @@ class Backend {
           ),
         ).generateContent([
           Content.text(
-            "According to the chapter name, provide a list of lessons. For each lesson, provide 3 suitable practice questions as well. Each question should be provided with the working for the solution of the question. Provide 4 choices for each answer, one has to contain the actual answer. At the sam Provide concrete examples and comprehensive elaborations. Humanise your reply as if you are an actual teacher. This is aimed to help a $userAge year old in $userLocation to understand the local syllabus. The chapter name is $chapter",
+            "According to the chapter name, provide a list of lessons. Since the content is meant to be displayed on a mobile screen, keep the contents clean and concise without compromising understanding. Each lesson should contain at least 3 subtopics, with a brief topic such as 'What is Area?' and an explanation as well as an example. This is aimed to help a $userAge year old in $userLocation to understand the local syllabus. The chapter name is $chapter",
           ),
         ]);
         List<dynamic> lessonList = jsonDecode(lessonListObject.text!);
 
         //Create the Doc to Hold the Lessons
-        setPath.doc(chapter).set({"completed": false});
+        generateQuestionsPath.doc(chapter).set({"completed": false});
 
         //Insert Lessons Into Lesson Folder
         await Future.wait(
           lessonList.map((lesson) =>
-            setPath
+            generateQuestionsPath
                 .doc(chapter)
                 .collection("Lessons")
                 .doc(lesson["lessonName"])
@@ -199,7 +202,8 @@ class Backend {
         );
       }),
     );
-
-    return;
+    //Reset for fetching
+    userInfoRetrieved=false;
+    return 1;
   }
 }

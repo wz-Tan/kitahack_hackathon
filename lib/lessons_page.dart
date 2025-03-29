@@ -1,92 +1,84 @@
 import 'package:flutter/material.dart';
-import 'package:kitahack_hackathon/account_page.dart';
 import 'package:kitahack_hackathon/colours.dart';
-import 'package:kitahack_hackathon/main.dart';
+import 'package:kitahack_hackathon/question_page.dart';
 import 'textstyles.dart';
-import "lessons_page.dart";
 
-class ChapterPage extends StatelessWidget {
-  const ChapterPage({super.key, required this.backend});
+class LessonsPage extends StatelessWidget {
+  const LessonsPage({super.key, required this.backend});
   final dynamic backend;
 
   @override
   Widget build(BuildContext context) {
-    List<String> chapterNames;
+    List<String> lessonNames;
 
     return FutureBuilder(
-      future: backend.retrieveChapters(),
+      future: backend.retrieveLessons(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          chapterNames = snapshot.data as List<String>;
+          lessonNames = snapshot.data as List<String>;
           return Scaffold(
             backgroundColor: Colors.white,
             body: SafeArea(
-              child: Center(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      //----------Title----------//
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10, bottom: 16),
-                        child: SizedBox(
-                          width: double.maxFinite,
-                          height: 50,
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                right: 20,
-                                bottom: 13,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) =>
-                                                AccountPage(backend: backend),
-                                      ),
-                                    );
-                                  },
-                                  child: Icon(Icons.settings),
-                                ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    //----------Title----------//
+                    Padding(
+                      padding: const EdgeInsets.only(top: 25, bottom: 16),
+                      child: SizedBox(
+                        width: double.maxFinite,
+                        height: 30,
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: 20,
+                              bottom: -5,
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                  }
+                                },
+                                child: Icon(Icons.keyboard_return),
                               ),
-                              Center(
-                                child: Text(
-                                  'Choose A Chapter',
-                                  style: defaultText
-                                ),
+                            ),
+                            Center(
+                              child: Text(
+                                'Choose A Lesson',
+                                style: defaultText
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
+                    ),
 
-                      //----------Chapters---------//
-                      Column(
-                        children: [
-                          ChapterList(chapters: chapterNames),
-                          SizedBox(height: 16),
-                        ],
-                      ),
-                    ],
-                  ),
+                    //----------Chapters---------//
+                    Column(
+                      children: [
+                        LessonList(lessons: lessonNames, backend: backend),
+                        SizedBox(height: 16),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
           );
         } else {
-          return Container(
+          return SizedBox(
             width: double.infinity,
             height: double.infinity,
-            color: Colors.white,
             child: Center(
               child: Column(
                 children: [
-                  SizedBox(height: 80),
-                  Text("Retrieving User Info", style: defaultText),
-                  CircularProgressIndicator(backgroundColor: Colors.grey),
+                  Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.grey,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -163,34 +155,36 @@ class _HoverRowState extends State<HoverRow> {
 }
 
 //----------Multiple Chapters----------//
-class ChapterList extends StatelessWidget {
-  final List<String> chapters;
+class LessonList extends StatelessWidget {
+  final dynamic backend;
+  final List<String> lessons;
 
-  const ChapterList({super.key, required this.chapters});
+  const LessonList({super.key, required this.lessons, required this.backend});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children:
-          chapters.asMap().entries.map((entry) {
+          lessons.asMap().entries.map((entry) {
             int index = entry.key;
-            String chapter = entry.value;
+            String lesson = entry.value;
 
             return Column(
               children: [
                 GestureDetector(
                   onTap: () {
-                    backend.currChapter = chapter;
+                    backend.currLesson = lesson;
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => LessonsPage(backend: backend),
+                        builder: (context) => QuestionPage(backend: backend),
                       ),
                     );
                   },
-                  child: HoverRow(text: chapter),
+                  child: HoverRow(text: lesson),
                 ),
-                if (index != chapters.length - 1) BottomBorder(),
+                if (index != lessons.length - 1) BottomBorder(),
               ],
             );
           }).toList(),
