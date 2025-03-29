@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kitahack_hackathon/account_page.dart';
 import 'package:kitahack_hackathon/colours.dart';
 import 'package:kitahack_hackathon/main.dart';
 import 'textstyles.dart';
@@ -28,12 +29,36 @@ class ChapterPage extends StatelessWidget {
                     children: [
                       //----------Title----------//
                       Padding(
-                        padding: const EdgeInsets.only(top: 25, bottom: 16),
-                        child: Text(
-                          'Select A Chapter',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                        padding: const EdgeInsets.only(top: 10, bottom: 16),
+                        child: SizedBox(
+                          width: double.maxFinite,
+                          height: 50,
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                right: 20,
+                                bottom: 13,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                AccountPage(backend: backend),
+                                      ),
+                                    );
+                                  },
+                                  child: Icon(Icons.settings),
+                                ),
+                              ),
+                              Center(
+                                child: Text(
+                                  'Choose A Chapter',
+                                  style: defaultText
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),

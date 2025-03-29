@@ -47,17 +47,16 @@ class _QuestionPageState extends State<QuestionPage> {
                     Stack(
                       children: [
                         Positioned(
-                          left: 10,
-                          bottom: 5,
+                          left: 20,
+                          bottom: 3,
                           child: GestureDetector(
                             onTap: () {
-                              if (context.mounted){
+                              if (context.mounted) {
                                 Navigator.pop(context);
                               }
                             },
-                            child: Icon(Icons.home),
-                          )
-
+                            child: Icon(Icons.keyboard_return),
+                          ),
                         ),
                         Center(
                           child: Text(
@@ -87,35 +86,35 @@ class _QuestionPageState extends State<QuestionPage> {
                     height: 30,
                     child: Stack(
                       children: [
-                        if (currQuestion!=0)
-                        Positioned(
-                        left: 0,
-                        top: 0,
-                        child: GestureDetector(
-                          onTap:()=> setState(() {
-                            currQuestion--;
-                          }),
-                          child:Icon(Icons.arrow_back_ios_sharp),
-                        
-                      ),
-                        ),
-                      if (currQuestion!=2)
-                        Positioned(
-                        right: 0,
-                        top: 0,
-                        child: GestureDetector(
-                          onTap:()=> setState(() {
-                            currQuestion++;
-                          }),
-                          child:Icon(Icons.arrow_forward_ios_sharp), 
-                        )
-                         
-                        )
-                      ] 
+                        if (currQuestion != 0)
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            child: GestureDetector(
+                              onTap:
+                                  () => setState(() {
+                                    currQuestion--;
+                                  }),
+                              child: Icon(Icons.arrow_back_ios_sharp),
+                            ),
+                          ),
+                        if (currQuestion != 2)
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: GestureDetector(
+                              onTap:
+                                  () => setState(() {
+                                    currQuestion++;
+                                  }),
+                              child: Icon(Icons.arrow_forward_ios_sharp),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                   Text(
-                    "What Is It?",
+                    "Explanation",
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
                     textAlign: TextAlign.justify,
                   ),

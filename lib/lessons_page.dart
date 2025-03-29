@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kitahack_hackathon/colours.dart';
-import 'package:kitahack_hackathon/questionPage_design.dart';
+import 'package:kitahack_hackathon/question_page.dart';
 import 'textstyles.dart';
 
 class LessonsPage extends StatelessWidget {
@@ -19,32 +19,51 @@ class LessonsPage extends StatelessWidget {
           return Scaffold(
             backgroundColor: Colors.white,
             body: SafeArea(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      //----------Title----------//
-                      Padding(
-                        padding: const EdgeInsets.only(top: 25, bottom: 16),
-                        child: Text(
-                          'Choose A Lesson',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    //----------Title----------//
+                    Padding(
+                      padding: const EdgeInsets.only(top: 25, bottom: 16),
+                      child: SizedBox(
+                        width: double.maxFinite,
+                        height: 30,
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: 20,
+                              bottom: -5,
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                  }
+                                },
+                                child: Icon(Icons.keyboard_return),
+                              ),
+                            ),
+                            Center(
+                              child: Text(
+                                'Choose A Lesson',
+                                style: defaultText
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+                    ),
 
-                      //----------Chapters---------//
-                      Column(
-                        children: [
-                          LessonList(lessons: lessonNames, backend:backend),
-                          SizedBox(height: 16),
-                        ],
-                      ),
-                    ],
-                  ),
+                    //----------Chapters---------//
+                    Column(
+                      children: [
+                        LessonList(lessons: lessonNames, backend: backend),
+                        SizedBox(height: 16),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -56,9 +75,10 @@ class LessonsPage extends StatelessWidget {
               child: Column(
                 children: [
                   Center(
-                    child: CircularProgressIndicator(backgroundColor: Colors.grey),
-                  )
-                  ,
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.grey,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -121,7 +141,10 @@ class _HoverRowState extends State<HoverRow> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(widget.text, style: TextStyle(color: _textColor, fontSize: 18)),
+              Text(
+                widget.text,
+                style: TextStyle(color: _textColor, fontSize: 18),
+              ),
               Icon(Icons.arrow_forward_ios_outlined, color: black),
             ],
           ),
@@ -133,7 +156,6 @@ class _HoverRowState extends State<HoverRow> {
 
 //----------Multiple Chapters----------//
 class LessonList extends StatelessWidget {
-  
   final dynamic backend;
   final List<String> lessons;
 
@@ -151,12 +173,12 @@ class LessonList extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap: () {
-                    backend.currLesson=lesson;
+                    backend.currLesson = lesson;
 
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => QuestionPage(backend: backend)
+                        builder: (context) => QuestionPage(backend: backend),
                       ),
                     );
                   },
