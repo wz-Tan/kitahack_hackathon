@@ -11,6 +11,7 @@ class Backend {
   late String google_api_key;
   late String gemini_api_key;
   late dynamic db;
+  late dynamic currSet;
   late dynamic setPath;
   late String userId;
   late dynamic userInfo;
@@ -44,6 +45,7 @@ class Backend {
       "age": age,
       "location": location,
       "latest_set": 0,
+      "current_set": 0
     });
   }
 
@@ -54,7 +56,8 @@ class Backend {
     setPath = db
         .collection("Users")
         .doc(userId)
-        .collection("Set ${userInfo["latest_set"]}");
+        .collection("Set ${userInfo["current_set"]}");
+    currSet=userInfo["current_set"];
     userInfoRetrieved = true;
   }
 
@@ -94,6 +97,10 @@ class Backend {
     return response;
   }
 
+  void updateCurrSet(int target){
+    db.collection("Users").doc(userId).update({"current_set": target});
+  }
+
   Future<int> generateQuestions() async {
     if (!userInfoRetrieved) await retrieveUserInfo();
 
@@ -103,7 +110,9 @@ class Backend {
     var latestSet = userInfo["latest_set"];
     latestSet++;
 
-    //Update Latest Set
+    updateCurrSet(latestSet);
+
+  
     db.collection("Users").doc(userId).update({"latest_set": latestSet});
     final generateQuestionsPath = db
         .collection("Users")
@@ -164,7 +173,7 @@ class Backend {
       ),
     ).generateContent([
       Content.text(
-        "Generate up to 12 math chapters for a $userAge year old in $userLocation based on the local syllabus, Keep the names as simple as possible while keeping a format such as Chapter 1: Multiplication",
+        "Generate up to 12 math chapters for a $userAge year old in $userLocation strictly based on the local syllabus and their age, Keep the names as simple as possible while keeping a format such as Chapter 1: Multiplication",
       ),
     ]);
 
@@ -206,4 +215,6 @@ class Backend {
     userInfoRetrieved=false;
     return 1;
   }
+
+  
 }

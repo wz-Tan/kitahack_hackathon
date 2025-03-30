@@ -2,19 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:kitahack_hackathon/account_page.dart';
 import 'package:kitahack_hackathon/colours.dart';
 import 'package:kitahack_hackathon/main.dart';
+import 'package:kitahack_hackathon/sets_page.dart';
 import 'textstyles.dart';
 import "lessons_page.dart";
 
-class ChapterPage extends StatelessWidget {
-  const ChapterPage({super.key, required this.backend});
+class ChapterPage extends StatefulWidget {
+  const ChapterPage({super.key, required this.backend, required this.redrawPage});
   final dynamic backend;
+  final dynamic redrawPage;
 
+  @override
+  State<ChapterPage> createState() => _ChapterPageState();
+}
+
+class _ChapterPageState extends State<ChapterPage> {
   @override
   Widget build(BuildContext context) {
     List<String> chapterNames;
 
     return FutureBuilder(
-      future: backend.retrieveChapters(),
+      future: widget.backend.retrieveChapters(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           chapterNames = snapshot.data as List<String>;
@@ -36,6 +43,25 @@ class ChapterPage extends StatelessWidget {
                           child: Stack(
                             children: [
                               Positioned(
+                                left: 20,
+                                bottom: 13,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => SetsPage(
+                                              backend: widget.backend,
+                                              refresh: widget.redrawPage
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                  child: Icon(Icons.format_line_spacing_sharp),
+                                ),
+                              ),
+                              Positioned(
                                 right: 20,
                                 bottom: 13,
                                 child: GestureDetector(
@@ -44,18 +70,19 @@ class ChapterPage extends StatelessWidget {
                                       context,
                                       MaterialPageRoute(
                                         builder:
-                                            (context) =>
-                                                AccountPage(backend: backend),
+                                            (context) => AccountPage(
+                                              backend: widget.backend,
+                                            ),
                                       ),
                                     );
                                   },
-                                  child: Icon(Icons.settings),
+                                  child: Icon(Icons.account_box_rounded),
                                 ),
                               ),
                               Center(
                                 child: Text(
                                   'Choose A Chapter',
-                                  style: defaultText
+                                  style: defaultText,
                                 ),
                               ),
                             ],

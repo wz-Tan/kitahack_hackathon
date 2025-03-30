@@ -104,7 +104,7 @@ class _MainLayoutState extends State<MainLayout> {
           );
         }
         if (snapshot.data == true) {
-          return chapter_page.ChapterPage(backend: backend);
+          return chapter_page.ChapterPage(backend: backend, redrawPage: redrawPage);
         }
 
         return Container(
