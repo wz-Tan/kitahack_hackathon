@@ -54,6 +54,8 @@ class _SetsPageState extends State<SetsPage> {
                                 ),
                           ),
                         );
+                        setState(() {
+                        });
                       },
                       child: Icon(Icons.add_circle_rounded),
                     ),

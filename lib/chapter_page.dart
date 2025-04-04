@@ -89,6 +89,12 @@ class _ChapterPageState extends State<ChapterPage> {
                           ),
                         ),
                       ),
+                      Center(
+                        child: Text(
+                                  'Current Set: ${backend.currSet}',
+                                  style: smallText,
+                                ),
+                      ),
 
                       //----------Chapters---------//
                       Column(

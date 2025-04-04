@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'dart:convert';
+import 'dart:core';
 
 class Backend {
   late String google_api_key;
@@ -45,7 +46,8 @@ class Backend {
       "age": age,
       "location": location,
       "latest_set": 0,
-      "current_set": 0
+      "current_set": 0,
+      "latest_generation_time": DateTime.now().add(Duration(minutes: -1)).toString()
     });
   }
 
@@ -103,17 +105,25 @@ class Backend {
 
   Future<int> generateQuestions() async {
     if (!userInfoRetrieved) await retrieveUserInfo();
+    var currentTime=DateTime.now();
 
     //Retrieve User Information
     var userAge = userInfo["age"];
     var userLocation = userInfo["location"];
     var latestSet = userInfo["latest_set"];
-    latestSet++;
+    var timeGenerated=DateTime.parse( userInfo["latest_generation_time"]);
+    var timeDifference=currentTime.difference(timeGenerated).inMinutes;
 
+
+    if (timeDifference<1){
+      return 0;
+    }
+
+    latestSet++;
     updateCurrSet(latestSet);
 
-  
     db.collection("Users").doc(userId).update({"latest_set": latestSet});
+    db.collection("Users").doc(userId).update({"latest_generation_time": currentTime.toString()});
     final generateQuestionsPath = db
         .collection("Users")
         .doc(userId)
@@ -163,7 +173,7 @@ class Backend {
       nullable: false,
     );
 
-    //Get List of Chapters
+    
     var chapterListObject = await GenerativeModel(
       model: 'gemini-2.0-flash',
       apiKey: gemini_api_key,
@@ -173,11 +183,12 @@ class Backend {
       ),
     ).generateContent([
       Content.text(
-        "Generate up to 12 math chapters for a $userAge year old in $userLocation strictly based on the local syllabus and their age, Keep the names as simple as possible while keeping a format such as Chapter 1: Multiplication",
+        "Chapter names should be within 25 characters. Generate up to 12 math chapters for a $userAge year old in $userLocation strictly based on the local syllabus and their age, Keep the names within 3 to 4 words while keeping a format such as Chapter 1: Multiplication",
       ),
     ]);
 
     List<dynamic> chapterList = jsonDecode(chapterListObject.text!);
+    
 
     //Generate List of Lessons for Each Chapter (Wait for Everything to Run due to Map)
     await Future.wait(
@@ -191,10 +202,11 @@ class Backend {
           ),
         ).generateContent([
           Content.text(
-            "According to the chapter name, provide a list of lessons. Since the content is meant to be displayed on a mobile screen, keep the contents clean and concise without compromising understanding. Each lesson should contain at least 3 subtopics, with a brief topic such as 'What is Area?' and an explanation as well as an example. This is aimed to help a $userAge year old in $userLocation to understand the local syllabus. The chapter name is $chapter",
+            "According to the chapter name, provide a list of lessons. Lesson names should not exceed 20 characters. Since the content is meant to be displayed on a mobile screen, keep the contents clean and concise without compromising understanding. Each lesson should contain at least 3 subtopics, with a brief topic such as 'What is Area?' and an explanation as well as an example. This is aimed to help a $userAge year old in $userLocation to understand the local syllabus. The chapter name is $chapter",
           ),
         ]);
         List<dynamic> lessonList = jsonDecode(lessonListObject.text!);
+        
 
         //Create the Doc to Hold the Lessons
         generateQuestionsPath.doc(chapter).set({"completed": false});
@@ -211,7 +223,7 @@ class Backend {
         );
       }),
     );
-    //Reset for fetching
+
     userInfoRetrieved=false;
     return 1;
   }
