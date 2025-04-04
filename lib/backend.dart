@@ -6,11 +6,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'dart:convert';
+import 'dart:core';
 
 class Backend {
   late String google_api_key;
   late String gemini_api_key;
   late dynamic db;
+  late dynamic currSet;
   late dynamic setPath;
   late String userId;
   late dynamic userInfo;
@@ -44,6 +46,9 @@ class Backend {
       "age": age,
       "location": location,
       "latest_set": 0,
+      "current_set": 0,
+      "latest_generation_time":
+          DateTime.now().add(Duration(minutes: -1)).toString(),
     });
   }
 
@@ -54,7 +59,8 @@ class Backend {
     setPath = db
         .collection("Users")
         .doc(userId)
-        .collection("Set ${userInfo["latest_set"]}");
+        .collection("Set ${userInfo["current_set"]}");
+    currSet = userInfo["current_set"];
     userInfoRetrieved = true;
   }
 
@@ -66,7 +72,7 @@ class Backend {
         chapterList.add(doc.id);
       }
     });
-    
+
     chapterList.sort((a, b) {
       int numA = int.parse(a.split(" ")[1].replaceAll(":", ""));
       int numB = int.parse(b.split(" ")[1].replaceAll(":", ""));
@@ -77,62 +83,78 @@ class Backend {
 
   Future<List<String>> retrieveLessons() async {
     List<String> lessonList = [];
-    await setPath.doc(currChapter).collection("Lessons").get().then((QuerySnapshot query) {
+    await setPath.doc(currChapter).collection("Lessons").get().then((
+      QuerySnapshot query,
+    ) {
       for (var doc in query.docs) {
         lessonList.add(doc.id);
       }
     });
-    
     return lessonList;
   }
 
   Future<dynamic> retrieveLesson() async {
     dynamic response;
-    await setPath.doc(currChapter).collection("Lessons").doc(currLesson).get().then((snapshot) {
-      response=snapshot.data();
-    });
+    await setPath
+        .doc(currChapter)
+        .collection("Lessons")
+        .doc(currLesson)
+        .get()
+        .then((snapshot) {
+          response = snapshot.data();
+        });
     return response;
+  }
+
+  void updateCurrSet(int target) {
+    db.collection("Users").doc(userId).update({"current_set": target});
   }
 
   Future<int> generateQuestions() async {
     if (!userInfoRetrieved) await retrieveUserInfo();
+    var currentTime = DateTime.now();
 
     //Retrieve User Information
     var userAge = userInfo["age"];
     var userLocation = userInfo["location"];
     var latestSet = userInfo["latest_set"];
-    latestSet++;
+    var timeGenerated = DateTime.parse(userInfo["latest_generation_time"]);
+    var timeDifference = currentTime.difference(timeGenerated).inMinutes;
 
-    //Update Latest Set
+    if (timeDifference < 1) {
+      return 0;
+    }
+
+    latestSet++;
+    updateCurrSet(latestSet);
+
     db.collection("Users").doc(userId).update({"latest_set": latestSet});
+    db.collection("Users").doc(userId).update({
+      "latest_generation_time": currentTime.toString(),
+    });
+
     final generateQuestionsPath = db
         .collection("Users")
         .doc(userId)
         .collection("Set $latestSet");
 
-
-    final topicSchema=Schema.object(
+    final topicSchema = Schema.object(
       properties: {
-        "topic": Schema.string(
-          nullable: false,
-        ),
+        "topic": Schema.string(nullable: false),
         "explanation": Schema.string(
-          description:
-              "Brief explanation on the topic",
+          description: "Brief explanation on the topic",
           nullable: false,
         ),
         "example": Schema.string(
-          description: "Based off topic and explanation, provide a simple example of the topic",
+          description:
+              "Based off topic and explanation, provide a simple example of the topic",
           nullable: false,
         ),
       },
-      requiredProperties: [
-        "topic",
-        "explanation",
-        "example"
-      ],
-      nullable: false
+      requiredProperties: ["topic", "explanation", "example"],
+      nullable: false,
     );
+
     final lessonSchema = Schema.object(
       description: "Schema for a Lesson",
       properties: {
@@ -141,20 +163,12 @@ class Backend {
           nullable: false,
         ),
 
-        "topicList":Schema.array(
-          items: topicSchema,
-          nullable: false,
-        )
-
+        "topicList": Schema.array(items: topicSchema, nullable: false),
       },
-      requiredProperties: [
-        "lessonName",
-        "topicList"
-      ],
+      requiredProperties: ["lessonName", "topicList"],
       nullable: false,
     );
 
-    //Get List of Chapters
     var chapterListObject = await GenerativeModel(
       model: 'gemini-2.0-flash',
       apiKey: gemini_api_key,
@@ -164,13 +178,12 @@ class Backend {
       ),
     ).generateContent([
       Content.text(
-        "Generate up to 12 math chapters for a $userAge year old in $userLocation based on the local syllabus, Keep the names as simple as possible while keeping a format such as Chapter 1: Multiplication",
+        "Chapter names should be within 25 characters. Generate up to 12 math chapters for a $userAge year old in $userLocation strictly based on the local syllabus and their age, Keep the names within 3 to 4 words while keeping a format such as Chapter 1: Multiplication",
       ),
     ]);
 
     List<dynamic> chapterList = jsonDecode(chapterListObject.text!);
 
-    //Generate List of Lessons for Each Chapter (Wait for Everything to Run due to Map)
     await Future.wait(
       chapterList.map((chapter) async {
         var lessonListObject = await GenerativeModel(
@@ -182,7 +195,7 @@ class Backend {
           ),
         ).generateContent([
           Content.text(
-            "According to the chapter name, provide a list of lessons. Since the content is meant to be displayed on a mobile screen, keep the contents clean and concise without compromising understanding. Each lesson should contain at least 3 subtopics, with a brief topic such as 'What is Area?' and an explanation as well as an example. This is aimed to help a $userAge year old in $userLocation to understand the local syllabus. The chapter name is $chapter",
+            "According to the chapter name, provide a list of lessons. Lesson names should not exceed 20 characters. Since the content is meant to be displayed on a mobile screen, keep the contents clean and concise without compromising understanding. Each lesson should contain at least 3 subtopics, with a brief topic such as 'What is Area?' and an explanation as well as an example. This is aimed to help a $userAge year old in $userLocation to understand the local syllabus. The chapter name is $chapter",
           ),
         ]);
         List<dynamic> lessonList = jsonDecode(lessonListObject.text!);
@@ -192,18 +205,18 @@ class Backend {
 
         //Insert Lessons Into Lesson Folder
         await Future.wait(
-          lessonList.map((lesson) =>
-            generateQuestionsPath
+          lessonList.map(
+            (lesson) => generateQuestionsPath
                 .doc(chapter)
                 .collection("Lessons")
                 .doc(lesson["lessonName"])
-                .set(lesson)
+                .set(lesson),
           ),
         );
       }),
     );
-    //Reset for fetching
-    userInfoRetrieved=false;
+
+    userInfoRetrieved = false;
     return 1;
   }
 }
