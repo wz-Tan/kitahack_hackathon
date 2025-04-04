@@ -47,7 +47,8 @@ class Backend {
       "location": location,
       "latest_set": 0,
       "current_set": 0,
-      "latest_generation_time": DateTime.now().add(Duration(minutes: -1)).toString()
+      "latest_generation_time":
+          DateTime.now().add(Duration(minutes: -1)).toString(),
     });
   }
 
@@ -59,7 +60,7 @@ class Backend {
         .collection("Users")
         .doc(userId)
         .collection("Set ${userInfo["current_set"]}");
-    currSet=userInfo["current_set"];
+    currSet = userInfo["current_set"];
     userInfoRetrieved = true;
   }
 
@@ -71,7 +72,7 @@ class Backend {
         chapterList.add(doc.id);
       }
     });
-    
+
     chapterList.sort((a, b) {
       int numA = int.parse(a.split(" ")[1].replaceAll(":", ""));
       int numB = int.parse(b.split(" ")[1].replaceAll(":", ""));
@@ -82,40 +83,45 @@ class Backend {
 
   Future<List<String>> retrieveLessons() async {
     List<String> lessonList = [];
-    await setPath.doc(currChapter).collection("Lessons").get().then((QuerySnapshot query) {
+    await setPath.doc(currChapter).collection("Lessons").get().then((
+      QuerySnapshot query,
+    ) {
       for (var doc in query.docs) {
         lessonList.add(doc.id);
       }
     });
-    
     return lessonList;
   }
 
   Future<dynamic> retrieveLesson() async {
     dynamic response;
-    await setPath.doc(currChapter).collection("Lessons").doc(currLesson).get().then((snapshot) {
-      response=snapshot.data();
-    });
+    await setPath
+        .doc(currChapter)
+        .collection("Lessons")
+        .doc(currLesson)
+        .get()
+        .then((snapshot) {
+          response = snapshot.data();
+        });
     return response;
   }
 
-  void updateCurrSet(int target){
+  void updateCurrSet(int target) {
     db.collection("Users").doc(userId).update({"current_set": target});
   }
 
   Future<int> generateQuestions() async {
     if (!userInfoRetrieved) await retrieveUserInfo();
-    var currentTime=DateTime.now();
+    var currentTime = DateTime.now();
 
     //Retrieve User Information
     var userAge = userInfo["age"];
     var userLocation = userInfo["location"];
     var latestSet = userInfo["latest_set"];
-    var timeGenerated=DateTime.parse( userInfo["latest_generation_time"]);
-    var timeDifference=currentTime.difference(timeGenerated).inMinutes;
+    var timeGenerated = DateTime.parse(userInfo["latest_generation_time"]);
+    var timeDifference = currentTime.difference(timeGenerated).inMinutes;
 
-
-    if (timeDifference<1){
+    if (timeDifference < 1) {
       return 0;
     }
 
@@ -123,35 +129,32 @@ class Backend {
     updateCurrSet(latestSet);
 
     db.collection("Users").doc(userId).update({"latest_set": latestSet});
-    db.collection("Users").doc(userId).update({"latest_generation_time": currentTime.toString()});
+    db.collection("Users").doc(userId).update({
+      "latest_generation_time": currentTime.toString(),
+    });
+
     final generateQuestionsPath = db
         .collection("Users")
         .doc(userId)
         .collection("Set $latestSet");
 
-
-    final topicSchema=Schema.object(
+    final topicSchema = Schema.object(
       properties: {
-        "topic": Schema.string(
-          nullable: false,
-        ),
+        "topic": Schema.string(nullable: false),
         "explanation": Schema.string(
-          description:
-              "Brief explanation on the topic",
+          description: "Brief explanation on the topic",
           nullable: false,
         ),
         "example": Schema.string(
-          description: "Based off topic and explanation, provide a simple example of the topic",
+          description:
+              "Based off topic and explanation, provide a simple example of the topic",
           nullable: false,
         ),
       },
-      requiredProperties: [
-        "topic",
-        "explanation",
-        "example"
-      ],
-      nullable: false
+      requiredProperties: ["topic", "explanation", "example"],
+      nullable: false,
     );
+
     final lessonSchema = Schema.object(
       description: "Schema for a Lesson",
       properties: {
@@ -160,20 +163,12 @@ class Backend {
           nullable: false,
         ),
 
-        "topicList":Schema.array(
-          items: topicSchema,
-          nullable: false,
-        )
-
+        "topicList": Schema.array(items: topicSchema, nullable: false),
       },
-      requiredProperties: [
-        "lessonName",
-        "topicList"
-      ],
+      requiredProperties: ["lessonName", "topicList"],
       nullable: false,
     );
 
-    
     var chapterListObject = await GenerativeModel(
       model: 'gemini-2.0-flash',
       apiKey: gemini_api_key,
@@ -188,9 +183,7 @@ class Backend {
     ]);
 
     List<dynamic> chapterList = jsonDecode(chapterListObject.text!);
-    
 
-    //Generate List of Lessons for Each Chapter (Wait for Everything to Run due to Map)
     await Future.wait(
       chapterList.map((chapter) async {
         var lessonListObject = await GenerativeModel(
@@ -206,27 +199,24 @@ class Backend {
           ),
         ]);
         List<dynamic> lessonList = jsonDecode(lessonListObject.text!);
-        
 
         //Create the Doc to Hold the Lessons
         generateQuestionsPath.doc(chapter).set({"completed": false});
 
         //Insert Lessons Into Lesson Folder
         await Future.wait(
-          lessonList.map((lesson) =>
-            generateQuestionsPath
+          lessonList.map(
+            (lesson) => generateQuestionsPath
                 .doc(chapter)
                 .collection("Lessons")
                 .doc(lesson["lessonName"])
-                .set(lesson)
+                .set(lesson),
           ),
         );
       }),
     );
 
-    userInfoRetrieved=false;
+    userInfoRetrieved = false;
     return 1;
   }
-
-  
 }
